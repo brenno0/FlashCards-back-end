@@ -27,10 +27,17 @@ model User {
 model Account {
   id           String        @id @default(uuid())
   name         String
-  bank         String
   userId       String
   user         User          @relation(fields: [userId], references: [id])
   transactions Transaction[]
+  Bank         Bank[]
+}
+
+model Bank {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  imageUrl String?
+  Account  Account[]
 }
 
 model Transaction {
