@@ -2,13 +2,10 @@ import { TransactionsPrismaRepository } from "@/repositories/prisma/transactions
 import { InvalidFileFormat } from "@/use-cases/errors/invalidFileFormat";
 import { NoCSVFileError } from "@/use-cases/errors/noCsvFileError";
 import { SaveNubankTransactionsUseCase } from "@/use-cases/saveNubankTransactions";
-import { FastifyInstance } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 
-export const loadBilling = (app: FastifyInstance) => {
-  app.post('/import-statement', async (request, reply) => {
-
+export const loadNubankBilling = async (request:FastifyRequest,reply:FastifyReply) => {
     try{
-
       const data = await request.file();
 
       const transactionsRepository = new TransactionsPrismaRepository()
@@ -22,8 +19,4 @@ export const loadBilling = (app: FastifyInstance) => {
       if(error instanceof NoCSVFileError) return reply.status(400).send({ error: error.message });
       if(error instanceof InvalidFileFormat) return reply.status(415).send({ error: error.message });
     }
-    
-   
-      
-  })
 }
