@@ -1,5 +1,5 @@
 import { Prisma, Transaction } from "generated/prisma";
 
 export interface TransactionsRepository {
-    create(data: Prisma.TransactionCreateInput):Promise<Transaction>
+    create(data: Prisma.TransactionUncheckedCreateInput):Promise<Transaction>
 }

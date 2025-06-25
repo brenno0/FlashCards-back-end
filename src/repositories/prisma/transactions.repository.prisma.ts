@@ -3,8 +3,8 @@ import { TransactionsRepository } from "../transactionsRepository";
 import { prisma } from "@/lib/prisma";
 
 export class TransactionsPrismaRepository implements TransactionsRepository {
-    create(data: Prisma.TransactionCreateInput): Promise<Transaction> {
-        const transaction = prisma.transaction.create({ data })
+    async create(data: Prisma.TransactionUncheckedCreateInput): Promise<Transaction> {
+        const transaction = await prisma.transaction.create({ data })
         
         return transaction;
     }

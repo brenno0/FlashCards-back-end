@@ -4,17 +4,18 @@ import { MultipartFile } from '@fastify/multipart';
 import { parse } from 'csv-parse';
 import { NoCSVFileError } from './errors/noCsvFileError';
 import { InvalidFileFormat } from './errors/invalidFileFormat';
-import { Prisma } from 'generated/prisma';
 
 
 interface SaveNuBankTransactionsExecuteRequest {
     data: MultipartFile | undefined;
+    accountId: string;
+    userId: string;
 }
 
 export class SaveNubankTransactionsUseCase {
     constructor(private readonly transactionRepository:TransactionsRepository) {}
     
-    async execute({ data }: SaveNuBankTransactionsExecuteRequest) {
+    async execute({ data, accountId, userId }: SaveNuBankTransactionsExecuteRequest) {
         
         if (!data ) throw new NoCSVFileError();
         if (data.mimetype !== 'text/csv' ) throw new InvalidFileFormat();
@@ -24,8 +25,6 @@ export class SaveNubankTransactionsUseCase {
         for await (const chunk of data.file) {
             chunks.push(chunk)
         }
-
-        
         
         const csvContent = Buffer.concat(chunks).toString('utf8');
 
@@ -47,7 +46,8 @@ export class SaveNubankTransactionsUseCase {
                 date:new Date(record.date),
                 description:record.title,
                 type: transactionType,
-                account: '' as Prisma.AccountCreateNestedOneWithoutTransactionsInput,
+                accountId,
+                userId,
             }) 
         })
 
