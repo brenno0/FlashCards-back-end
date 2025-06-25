@@ -6,15 +6,26 @@ import { createCategories } from "./controllers/category.controller"
 import { verifyJWT } from "./middlewares/verifyJWT"
 import { createAccounts } from "./controllers/accounts.controller"
 import { importItauStatement } from "./controllers/importItauStatement.controller"
+import { getTransactions } from "./controllers/transactions.controller"
 
 export const appRoutes = async (app:FastifyInstance) => {
     app.post('/auth/sign-up', createUser)
     app.post('/auth/sign-in', authenticate)
 
     /* Authenticated routes */
+
+    // Transactions
+    app.get('/transactions', { onRequest:[verifyJWT] }, getTransactions)
     app.post('/import-statement/nubank', { onRequest:[verifyJWT] }, loadNubankBilling)
     app.post('/import-statement/itau', { onRequest:[verifyJWT] }, importItauStatement)
+
+    
+    // Banks
     app.post('/banks/create', { onRequest:[verifyJWT] }, createBanks)
+    
+    // Categories
     app.post('/categories/create', { onRequest:[verifyJWT] }, createCategories)
+    
+    // Accounts
     app.post('/accounts/create', { onRequest:[verifyJWT] }, createAccounts)
 }
