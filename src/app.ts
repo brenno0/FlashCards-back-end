@@ -4,11 +4,15 @@ import { prisma } from './lib/prisma';
 import multipart from '@fastify/multipart';
 import { ZodError } from 'zod';
 import { env } from './env';
+import fastifyJwt from '@fastify/jwt';
 
 export const app = fastify()
 
 app.decorate('prisma', prisma);
 
+app.register(fastifyJwt, {
+    secret: env.JWT_SECRET
+})
 app.register(appRoutes)
 app.register(multipart);
 

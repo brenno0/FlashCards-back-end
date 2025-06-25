@@ -42,12 +42,18 @@ export const authenticate = async (request:FastifyRequest,reply:FastifyReply) =>
         const usersRepository = new UsersPrismaRepository()
         const authenticateUseCase = new AuthenticateUseCase(usersRepository)
 
-        await authenticateUseCase.handle({
+       const { user } = await authenticateUseCase.handle({
             email,
             password
         })
+
+        const token = await reply.jwtSign({}, {
+            sign: {
+                sub:user.id
+            }
+        })
         
-        return reply.status(200).send();    
+        return reply.status(200).send({ token });    
 
     }catch(err) {
         if(err instanceof InvalidCredentialsError) reply.status(400).send({ message:err.message })
