@@ -28,20 +28,17 @@ export const loadNubankBilling = async (request: FastifyRequest, reply: FastifyR
     const saveNubankTransactionsUseCase = makeNubankBilling();
     const userId = request.user.sub;
 
-    const { records } = await saveNubankTransactionsUseCase.execute({
+    const { transactions } = await saveNubankTransactionsUseCase.execute({
       data: file,
       userId,
       accountId: validatedAccountId,
     });
 
-    return reply.send({ message: 'CSV parsed successfully', data: records });
+    return reply.send({ message: 'CSV parsed successfully', data: transactions });
   } catch (error) {
-    if (error instanceof NoCSVFileError)
-      return reply.status(400).send({ error: error.message });
-    if (error instanceof InvalidFileFormat)
-      return reply.status(415).send({ error: error.message });
+    if (error instanceof NoCSVFileError) return reply.status(400).send({ error: error.message });
+    if (error instanceof InvalidFileFormat) return reply.status(415).send({ error: error.message });
 
-    console.error(error);
     return reply.status(500).send({ error: 'Internal server error' });
   }
 };

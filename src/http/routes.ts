@@ -1,10 +1,11 @@
 import { FastifyInstance } from "fastify"
-import { loadNubankBilling } from "./controllers/importStatement.controller"
+import { loadNubankBilling } from "./controllers/importNubankStatement.controller"
 import { authenticate, createUser } from "./controllers/auth.controller"
 import { createBanks } from "./controllers/banks.controller"
 import { createCategories } from "./controllers/category.controller"
 import { verifyJWT } from "./middlewares/verifyJWT"
 import { createAccounts } from "./controllers/accounts.controller"
+import { importItauStatement } from "./controllers/importItauStatement.controller"
 
 export const appRoutes = async (app:FastifyInstance) => {
     app.post('/auth/sign-up', createUser)
@@ -12,6 +13,7 @@ export const appRoutes = async (app:FastifyInstance) => {
 
     /* Authenticated routes */
     app.post('/import-statement/nubank', { onRequest:[verifyJWT] }, loadNubankBilling)
+    app.post('/import-statement/itau', { onRequest:[verifyJWT] }, importItauStatement)
     app.post('/banks/create', { onRequest:[verifyJWT] }, createBanks)
     app.post('/categories/create', { onRequest:[verifyJWT] }, createCategories)
     app.post('/accounts/create', { onRequest:[verifyJWT] }, createAccounts)
