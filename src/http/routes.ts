@@ -8,13 +8,6 @@ import { importItauStatement } from "./controllers/importItauStatement.controlle
 import { getTransactions } from "./controllers/transactions.controller"
 import { FastifyTypedInstance } from "@/@types/fastifyTypes"
 import { z } from "zod"
-import { MissingDateParamsError } from "@/use-cases/errors/missingDateParams"
-import { NoCSVFileError } from "@/use-cases/errors/noCsvFileError"
-import { InvalidFileFormat } from "@/use-cases/errors/invalidFileFormat"
-import { BankAlreadyExistsError } from "@/use-cases/errors/bankAlreadyExists"
-import { CategoryAlreadyExistsError } from "@/use-cases/errors/categoryAlreadyExists"
-import { AccountAlreadyExistsError } from "@/use-cases/errors/accountAlreadyExists"
-import { UserAlreadyExistsError } from "@/use-cases/errors/userAlreadyExists"
 
 export const appRoutes = async (app:FastifyTypedInstance) => {
     app.post('/auth/sign-up', { schema:{
@@ -34,7 +27,8 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
            password:z.string(),
         }),
         400: z.object({
-            message:z.instanceof(UserAlreadyExistsError)
+            error: z.string(),
+            message: z.string()
         }),
         }
       
@@ -48,6 +42,10 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
         response: {
             200: z.object({
                 token:z.string()
+            }),
+            401: z.object({
+                error: z.string(),
+                message: z.string()
             }),
         }
     } } ,authenticate)
@@ -79,10 +77,12 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
                 type: z.enum(['INCOME','EXPENSE'])
             }),
             500:  z.object({
-                message:z.instanceof(MissingDateParamsError)
+                error: z.string().optional(),
+                message: z.string()
             }),
             400: z.object({
-                message:z.string()
+                error: z.string(),
+                message: z.string()
             }) 
         }
     } }, getTransactions)
@@ -106,10 +106,12 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
                     type: z.enum(['INCOME','EXPENSE'])
             })),
             400: z.object({
-                message:z.instanceof(NoCSVFileError)
+                error: z.string(),
+                message: z.string()
             }),
             415: z.object({
-                message:z.instanceof(InvalidFileFormat)
+                error: z.string(),
+                message: z.string()
             }),
             500:z.object({
                 message:z.string()
@@ -124,7 +126,8 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
         description:"Nubank file statement import",
         body: z.object({
             accountId:z.string().nonempty(),
-            file:z.instanceof(File)
+            error: z.string(),
+            message: z.string()
         }),
 
         response: {
@@ -159,7 +162,8 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
                 name:z.string()
             }),
             400: z.object({
-                message:z.instanceof(BankAlreadyExistsError)
+                error: z.string(),
+                message: z.string()
             }),
         }
     } }, createBanks)
@@ -176,7 +180,8 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
                 name:z.string()
             }),
             400: z.object({
-                message:z.instanceof(CategoryAlreadyExistsError)
+                error: z.string(),
+                message: z.string()
             }),
         }
     } }, createCategories)
@@ -189,7 +194,8 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
             name:z.string()
         }),
         400: z.object({
-            message:z.instanceof(AccountAlreadyExistsError)
+            error: z.string(),
+            message: z.string()
         }),
     } }, createAccounts)
 }

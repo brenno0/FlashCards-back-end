@@ -28,7 +28,7 @@ export const getTransactions = async (request:FastifyRequest,reply:FastifyReply)
         reply.status(200).send(transactions)
       
     }catch(error) {
-        if(error instanceof MissingDateParamsError) reply.status(400).send({ message: error.message })
+        if(error instanceof MissingDateParamsError) reply.status(400).send({ message: error.message, error: 'MissingDateParamsError' })
        return reply.status(500).send({ message: "Internal server error." });
     }
 }

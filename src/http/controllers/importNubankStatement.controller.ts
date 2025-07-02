@@ -36,8 +36,8 @@ export const loadNubankBilling = async (request: FastifyRequest, reply: FastifyR
 
     return reply.send(transactions);
   } catch (error) {
-    if (error instanceof NoCSVFileError) return reply.status(400).send({ message: error.message });
-    if (error instanceof InvalidFileFormat) return reply.status(415).send({ message: error.message });
+    if (error instanceof NoCSVFileError) return reply.status(400).send({ message: error.message, error:'NoCSVFileError' });
+    if (error instanceof InvalidFileFormat) return reply.status(415).send({ message: error.message, error:'InvalidFileFormat' });
 
     return reply.status(500).send({ message: 'Internal server error' });
   }

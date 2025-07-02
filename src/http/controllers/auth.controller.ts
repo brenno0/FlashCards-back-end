@@ -26,7 +26,7 @@ export const createUser = async (request:FastifyRequest,reply:FastifyReply) => {
 
         return reply.status(201).send(user);
     }catch(error) {
-        if(error instanceof UserAlreadyExistsError) reply.status(400).send({ message:error.message })
+        if(error instanceof UserAlreadyExistsError) reply.status(400).send({ message:error.message, error:'UserAlreadyExistsError' })
     }
 }
 
@@ -56,8 +56,7 @@ export const authenticate = async (request:FastifyRequest,reply:FastifyReply) =>
         return reply.status(200).send({ token });    
 
     }catch(err) {
-        if(err instanceof InvalidCredentialsError) reply.status(401).send({ message:err.message })
-        console.log("err", err)
+        if(err instanceof InvalidCredentialsError) reply.status(401).send({ message:err.message, error:'InvalidCredentialsError' })
         throw err;
     }
     
