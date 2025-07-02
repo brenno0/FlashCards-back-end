@@ -23,6 +23,6 @@ export const createBanks = async (request:FastifyRequest,reply:FastifyReply) => 
       reply.status(201).send(bank)
       
     }catch(error) {
-      if(error instanceof BankAlreadyExistsError) return reply.status(400).send({ error: error.message });
+      if(error instanceof BankAlreadyExistsError) return reply.status(400).send({ message: error.message });
     }
 }

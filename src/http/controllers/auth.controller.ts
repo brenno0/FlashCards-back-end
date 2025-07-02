@@ -13,7 +13,7 @@ export const createUser = async (request:FastifyRequest,reply:FastifyReply) => {
         
         const registerBodySchema = z.object({
             name:z.string(),
-            email:z.string().email("Por favor insira um e-mail válido"),
+            email:z.string().email("Please insert an valid e-mail."),
             password:z.string().min(6)
         })
         const { name, email, password } = registerBodySchema.parse(request.body);
@@ -56,8 +56,8 @@ export const authenticate = async (request:FastifyRequest,reply:FastifyReply) =>
         return reply.status(200).send({ token });    
 
     }catch(err) {
-        if(err instanceof InvalidCredentialsError) reply.status(400).send({ message:err.message })
-
+        if(err instanceof InvalidCredentialsError) reply.status(401).send({ message:err.message })
+        console.log("err", err)
         throw err;
     }
     

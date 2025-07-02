@@ -22,7 +22,7 @@ export class GetTransactionsUseCase {
         const transactions = await this.transactionsRepository.searchMany(params,userId)
 
         if((finalDate && !startDate) || (!finalDate && startDate)) throw new MissingDateParamsError()
-        
+            
         return { transactions };
     }   
 }

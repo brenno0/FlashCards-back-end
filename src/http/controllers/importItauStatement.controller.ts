@@ -13,7 +13,6 @@ export const importItauStatement = async (request: FastifyRequest, reply: Fastif
     if (part.type === 'file') {
       buffer = await part.toBuffer()
     } else if (part.type === 'field') {
-      console.log('Campo recebido:', part.fieldname, 'valor:', part.value)
 
       if (part.fieldname === 'accountId') {
         accountId = part.value as string | null

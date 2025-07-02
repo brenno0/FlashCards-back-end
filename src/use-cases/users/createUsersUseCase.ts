@@ -24,8 +24,6 @@ export class CreateUsersUseCase {
             email,
             password: password_hash
         })
-        console.log('user', user)
-    
         return { user }
     }
 }

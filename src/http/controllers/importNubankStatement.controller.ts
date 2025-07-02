@@ -34,11 +34,11 @@ export const loadNubankBilling = async (request: FastifyRequest, reply: FastifyR
       accountId: validatedAccountId,
     });
 
-    return reply.send({ message: 'CSV parsed successfully', data: transactions });
+    return reply.send(transactions);
   } catch (error) {
-    if (error instanceof NoCSVFileError) return reply.status(400).send({ error: error.message });
-    if (error instanceof InvalidFileFormat) return reply.status(415).send({ error: error.message });
+    if (error instanceof NoCSVFileError) return reply.status(400).send({ message: error.message });
+    if (error instanceof InvalidFileFormat) return reply.status(415).send({ message: error.message });
 
-    return reply.status(500).send({ error: 'Internal server error' });
+    return reply.status(500).send({ message: 'Internal server error' });
   }
 };

@@ -23,6 +23,6 @@ export const createCategories = async (request:FastifyRequest,reply:FastifyReply
         reply.status(201).send(category)
       
     }catch(error) {
-      if(error instanceof CategoryAlreadyExistsError) return reply.status(400).send({ error: error.message });
+      if(error instanceof CategoryAlreadyExistsError) return reply.status(400).send({ message: error.message });
     }
 }

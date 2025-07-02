@@ -35,7 +35,7 @@ export class SaveNubankTransactionsUseCase {
             })
           })
         )
-      
+    
         return { transactions: createdTransactions }
       }
       

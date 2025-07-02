@@ -6,16 +6,43 @@ import { ZodError } from 'zod';
 import { env } from './env';
 import fastifyJwt from '@fastify/jwt';
 import dotenv from 'dotenv'
+import { validatorCompiler, serializerCompiler, ZodTypeProvider, jsonSchemaTransform} from 'fastify-type-provider-zod';
+import { fastifySwagger } from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
+import cors from '@fastify/cors'
 
-export const app = fastify()
+export const app = fastify().withTypeProvider<ZodTypeProvider>()
+ app.register(cors, {
+    allowedHeaders:'*'
+  })
+  
+
+app.setValidatorCompiler(validatorCompiler)
+app.setSerializerCompiler(serializerCompiler)
+
+app.register(fastifySwagger, {
+    openapi: {
+        info:{
+            title:"BFinnance API",
+            version:'1.0.0'
+        },
+    },
+    transform: jsonSchemaTransform
+})
+
+app.register(fastifySwaggerUi, {
+    routePrefix:"/docs"
+})
 
 dotenv.config()
+
 app.decorate('prisma', prisma);
 
 app.register(fastifyJwt, {
     secret: env.JWT_SECRET
 })
 app.register(multipart);
+
 app.register(appRoutes)
 
 
