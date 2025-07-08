@@ -18,7 +18,6 @@ export class GetTransactionsUseCase {
     async execute({ params, userId }:GetTransactionsUseCaseRequest):Promise<GetTransactionsUseCaseResponse> {
 
         const { finalDate, startDate } = params;
-        
         const transactions = await this.transactionsRepository.searchMany(params,userId)
 
         if((finalDate && !startDate) || (!finalDate && startDate)) throw new MissingDateParamsError()

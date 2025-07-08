@@ -1,10 +1,11 @@
 import { TransactionsRepository } from '@/repositories/transactionsRepository';
 import { NoPDFFileError } from '../errors/noPdfFile';
 import { readPDF } from '@/utils/pdfReader';
+import { RequiredResource } from '../errors/requiredResource';
 
 
 interface SaveItauTransactionsExecuteRequest {
-    data: Buffer<ArrayBufferLike> | undefined;
+    data: Buffer<ArrayBufferLike> | null;
     accountId: string;
     userId: string;
 }
@@ -15,6 +16,8 @@ export class SaveItauTransactionsUseCase {
     async execute({ data, accountId, userId }: SaveItauTransactionsExecuteRequest) {
 
         if (!data) throw new NoPDFFileError();
+        
+        if(!accountId) throw new RequiredResource('accountId')
 
         const parsedTransactions  = await readPDF(data);
         

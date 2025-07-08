@@ -8,6 +8,7 @@ import { importItauStatement } from "./controllers/importItauStatement.controlle
 import { getTransactions } from "./controllers/transactions.controller"
 import { FastifyTypedInstance } from "@/@types/fastifyTypes"
 import { z } from "zod"
+import { optionalDateSchema } from "@/lib/schemas/optionalDateSchema"
 
 export const appRoutes = async (app:FastifyTypedInstance) => {
     app.post('/auth/sign-up', { schema:{
@@ -60,22 +61,22 @@ export const appRoutes = async (app:FastifyTypedInstance) => {
         querystring: z.object({
             accountId:z.string().optional(),
             amount:z.string().optional(),
-            startDate:z.date().optional(),
-            finalDate:z.date().optional(),
+            startDate:optionalDateSchema,
+            finalDate:optionalDateSchema,
             description:z.string().optional(),
             id:z.string().optional(),
             type:z.enum(['INCOME','EXPENSE']).optional()
         }),
         response:{
-            200:z.object({
+            200:z.array(z.object({
                 accountId:z.string(),
                 amount:z.number(),
-                categoryId:z.string(),
+                categoryId:z.string().nullable(),
                 date:z.date(),
                 description:z.string(),
                 id:z.string(),
                 type: z.enum(['INCOME','EXPENSE'])
-            }),
+            })),
             500:  z.object({
                 error: z.string().optional(),
                 message: z.string()

@@ -49,7 +49,7 @@ export class TransactionsPrismaRepository implements TransactionsRepository {
                 ...(startDate || finalDate ? { date: dateFilter } : {})
             }
         })
-
+        console.log('transaction', transaction)
         return transaction;
     }
 }

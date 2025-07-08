@@ -3,8 +3,8 @@ import { Prisma, Transaction, TransactionType } from "generated/prisma";
 export interface SearchManyTransactionsParams {
     accountId?:string;
     amount?:string;
-    startDate?:Date;
-    finalDate?:Date;
+    startDate?:Date | string;
+    finalDate?:Date | string;
     description?:string;
     id?:string;
     type?:TransactionType
