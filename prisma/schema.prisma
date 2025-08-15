@@ -1,66 +1,65 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
-}
+// Choose one provider. Comment/uncomment as needed.
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
 model User {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  password     String
-  accounts     Account[]
-  transactions Transaction[]
-  createdAt    DateTime      @default(now())
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites Favorite[]
+  watchlist Watchlist[]
 }
 
-model Account {
-  id           String        @id @default(uuid())
-  name         String
-  userId       String
-  user         User          @relation(fields: [userId], references: [id])
-  transactions Transaction[]
-  Bank         Bank[]
+model Movie {
+  id          String @id @default(uuid())
+  tmdbId      Int    @unique
+  title       String
+  overview    String
+  posterPath  String
+  voteAverage Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favoritedBy Favorite[]
+  inWatchlist Watchlist[]
 }
 
-model Bank {
-  id       String    @id @default(uuid())
-  name     String    @unique
-  imageUrl String?
-  Account  Account[]
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  movieId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
 }
 
-model Transaction {
-  id          String          @id @default(uuid())
-  date        DateTime
-  description String
-  amount      Float
-  type        TransactionType
-  accountId   String
-  account     Account         @relation(fields: [accountId], references: [id])
-  categoryId  String?
-  category    Category?       @relation(fields: [categoryId], references: [id])
-  User        User?           @relation(fields: [userId], references: [id])
-  userId      String?
-}
+model Watchlist {
+  id        String   @id @default(uuid())
+  userId    String
+  movieId   String
+  createdAt DateTime @default(now())
 
-model Category {
-  id           String        @id @default(uuid())
-  name         String        @unique
-  transactions Transaction[]
-}
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
 
-enum TransactionType {
-  INCOME
-  EXPENSE
+  @@unique([userId, movieId])
 }

@@ -1,5 +1,5 @@
 export class BankAlreadyExistsError extends Error {
     constructor() {
-        super('Bank already exists.')
+        super('Bank already exists.');
     }
 }

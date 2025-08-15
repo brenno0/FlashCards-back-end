@@ -1,9 +1,12 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from 'fastify';
 
-export const verifyJWT = async (request:FastifyRequest, reply:FastifyReply) => {
+export const verifyJWT = async (
+    request: FastifyRequest,
+    reply: FastifyReply
+) => {
     try {
         return await request.jwtVerify();
-    }catch {
-        reply.status(401).send({ message:'Unauthorized.' })
+    } catch {
+        reply.status(401).send({ message: 'Unauthorized.' });
     }
-}
+};
