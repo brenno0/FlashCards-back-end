@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/brenno0/Movies-Series-streaming---Back-end/compare/v2.1.4...v2.2.0) (2025-08-19)
+
+
+### Features
+
+* creating routes and documentations ([c6a8746](https://github.com/brenno0/Movies-Series-streaming---Back-end/commit/c6a87465c817ad8893b1062a3bb1b65ccaff5f9a))
+
 ### [2.1.4](https://github.com/brenno0/Movies-Series-streaming---Back-end/compare/v2.1.3...v2.1.4) (2025-08-19)
 
 ### [2.1.3](https://github.com/brenno0/Movies-Series-streaming---Back-end/compare/v2.1.2...v2.1.3) (2025-08-19)
