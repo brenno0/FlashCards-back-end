@@ -1,12 +1,4 @@
-
----
-
-### **README.pt-BR.md** (português)
-
-```markdown
 # 🎬 Movies & Series Streaming – Back-End
-
-> [English](README.md) | Português
 
 ---
 
