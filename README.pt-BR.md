@@ -59,7 +59,6 @@ npm run dev – Inicia o servidor em modo de desenvolvimento
 
 npm run build – Compila o código para produção
 
-npm run start – Inicia o servidor em produção
 
 npm run lint – Executa o linter
 
@@ -74,16 +73,3 @@ bash
 Copiar
 Editar
 docker-compose up --build
-📝 Contribuindo
-Faça um fork do projeto
-
-Crie uma branch para sua feature (git checkout -b feature/nova-feature)
-
-Faça commit das suas alterações (git commit -am 'Adiciona nova feature')
-
-Faça push para a branch (git push origin feature/nova-feature)
-
-Abra um Pull Request
-
-📄 Licença
-Este projeto está licenciado sob a licença MIT – veja LICENSE para mais detalhes.
