@@ -51,13 +51,13 @@ describe('Register Use Case', () => {
       throw new Error('Watchlist não foi criada');
     }
 
-    await sut.execute(watchList.id);
+    await sut.execute({ id: watchList.id });
     expect(watchListRepository.items).toEqual([]);
   });
 
   it('Should not be able to delete an watchList that does not exists', async () => {
     await expect(
-      async () => await sut.execute('watchList-test-id'),
+      async () => await sut.execute({ id: 'watchList-test-id' }),
     ).rejects.toThrow('Lista de filmes não encontrado');
   });
 });
