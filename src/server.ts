@@ -1,9 +1,11 @@
 import { app } from './app';
 import { env } from './env';
 
-app.listen({
+app
+  .listen({
     port: env.PORT,
     host: '0.0.0.0',
-}).then(() => {
+  })
+  .then(() => {
     console.log('Server is running!');
-});
+  });

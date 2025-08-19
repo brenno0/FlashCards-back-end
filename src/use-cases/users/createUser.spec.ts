@@ -1,9 +1,8 @@
 import { expect, describe, it, beforeEach } from 'vitest';
 
-import { CreateUsersUseCase } from '@/use-cases/users/createUsersUseCase';
-
 import { InMemoryUsersRepository } from '../../repositories/in-memory/in-memory-users-repository';
 import { UserAlreadyExistsError } from '../errors/userAlreadyExists';
+import { CreateUsersUseCase } from '../users/createUsersUseCase';
 
 let usersRepository: InMemoryUsersRepository;
 let sut: CreateUsersUseCase;
