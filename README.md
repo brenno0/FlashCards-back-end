@@ -62,8 +62,6 @@ npm run dev – Start the development server
 
 npm run build – Compile code for production
 
-npm run start – Start the production server
-
 npm run lint – Run linter
 
 npm run format – Format code
@@ -75,18 +73,6 @@ npm run release – Create a new release and update CHANGELOG
 Run the project with Docker:
 
 docker-compose up --build
-
-📝 Contributing
-
-Fork the repository
-
-Create a branch for your feature (git checkout -b feature/new-feature)
-
-Commit your changes (git commit -am 'Add new feature')
-
-Push to the branch (git push origin feature/new-feature)
-
-Open a Pull Request
 
 📄 License
 
