@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { ResourceAlreadyExists } from '@/use-cases/errors/resourceAlreadyExists';
 import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { makeCreateWatchList } from '@/use-cases/factories/make-create-watchlist';
+import { makeDeleteWatchList } from '@/use-cases/factories/make-delete-watchList';
 import { makeGetAllWatchList } from '@/use-cases/factories/make-get-all-watchList';
 
 export const getAllWatchLists = async (
@@ -84,6 +85,33 @@ export const createWatchList = async (
 
     if (err instanceof ResourceAlreadyExists) {
       return reply.status(400).send({
+        message: err.message,
+        error: 'ResourceNotFound',
+      });
+    }
+  }
+};
+
+export const deleteWatchList = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { deleteWatchListUseCase } = makeDeleteWatchList();
+
+    const paramsSchema = z.object({
+      id: z.string(),
+    });
+
+    const { id } = paramsSchema.parse(request.params);
+    await deleteWatchListUseCase.execute({ id });
+
+    return reply
+      .status(202)
+      .send({ message: 'Filme removido da lista com sucesso.' });
+  } catch (err) {
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({
         message: err.message,
         error: 'ResourceNotFound',
       });

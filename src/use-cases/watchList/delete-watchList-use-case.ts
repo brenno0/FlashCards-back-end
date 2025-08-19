@@ -5,7 +5,7 @@ import { ResourceNotFoundError } from '../errors/resourceNotFound';
 export class DeleteWatchListUseCase {
   constructor(private readonly watchListRepository: WatchListRepository) {}
 
-  async execute(id: string): Promise<void> {
+  async execute({ id }: { id: string }): Promise<void> {
     const watchList = await this.watchListRepository.findById(id);
 
     if (!watchList) {
