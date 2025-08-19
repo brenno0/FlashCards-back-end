@@ -31,7 +31,7 @@ export const createUser = async (
     if (error instanceof UserAlreadyExistsError) {
       reply.status(400).send({
         message: error.message,
-        error: 'UserAlreadyExistsError',
+        error: 'UserAlreadyExistsErrortest',
       });
     }
   }
