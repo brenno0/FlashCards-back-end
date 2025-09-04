@@ -13,9 +13,9 @@ Cada deck pertence a 1 usuário.
 
 Endpoints sugeridos:
 
-POST /decks → criar baralho
+[X] POST /decks → criar baralho
 
-GET /decks → listar baralhos do usuário autenticado
+[X] GET /decks → listar baralhos do usuário autenticado
 
 GET /decks/:id → detalhes de 1 baralho
 

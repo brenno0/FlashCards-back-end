@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { FastifyTypedInstance } from '@/@types/fastifyTypes';
 
 import { authenticate, createUser } from './controllers/auth.controller';
-import { createDeck } from './controllers/decks.controller';
+import { createDeck, getAllDecks } from './controllers/decks.controller';
 import { getUser } from './controllers/users.controller';
 import { verifyJWT } from './middlewares/verifyJWT';
 
@@ -109,5 +109,44 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     createDeck,
+  );
+
+  app.get(
+    '/decks',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        operationId: 'getAllDecks',
+        querystring: z.object({
+          title: z.string().optional().nullable(),
+          description: z.string().optional().nullable(),
+          isPublic: z.boolean().optional().nullable(),
+          page: z.number().optional(),
+          pageSize: z.number().optional(),
+        }),
+        response: {
+          200: z.object({
+            data: z.array(
+              z.object({
+                id: z.string(),
+                title: z.string(),
+                description: z.string().nullable(),
+                isPublic: z.boolean(),
+                createdAt: z.date(),
+                updatedAt: z.date(),
+              }),
+            ),
+            count: z.number(),
+            page: z.number(),
+            pageSize: z.number(),
+          }),
+          400: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    getAllDecks,
   );
 };

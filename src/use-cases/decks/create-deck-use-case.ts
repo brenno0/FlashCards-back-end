@@ -10,7 +10,7 @@ interface CreateDeckUseCaseRequest {
 }
 
 export class CreateDeckUseCase {
-  constructor(readonly decksRepository: DecksRepository) {}
+  constructor(private readonly decksRepository: DecksRepository) {}
 
   async handle({
     title,
@@ -18,7 +18,7 @@ export class CreateDeckUseCase {
     description,
     isPublic,
   }: CreateDeckUseCaseRequest) {
-    const deckTitle = await this.decksRepository.findByTitle(title);
+    const deckTitle = await this.decksRepository.findByTitle(title, userId);
 
     if (deckTitle) {
       throw new ResourceAlreadyExists({ resource: 'Deck' });
