@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.2.3...v2.3.0) (2025-09-04)
+
+
+### Features
+
+* creating list-all decks feature with filters and pagination ([93777a8](https://github.com/brenno0/FlashCards-back-end/commit/93777a8cc46658b709c57e967936bccce81d3d46))
+
 ### [2.2.3](https://github.com/brenno0/FlashCards-back-end/compare/v2.2.2...v2.2.3) (2025-09-04)
 
 ### [2.2.2](https://github.com/brenno0/Movies-Series-streaming---Back-end/compare/v2.2.1...v2.2.2) (2025-08-19)
