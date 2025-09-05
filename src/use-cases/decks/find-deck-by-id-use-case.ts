@@ -5,10 +5,9 @@ import { ResourceNotFoundError } from '../errors/resourceNotFound';
 export class GetDeckByIdUseCase {
   constructor(private readonly decksRepository: DecksRepository) {}
 
-  async handle({ deckId, userId }: { deckId: string; userId: string }) {
+  async handle({ deckId }: { deckId: string }) {
     const deck = await this.decksRepository.getById({
       deckId,
-      userId,
     });
 
     if (!deck) {

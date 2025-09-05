@@ -7,6 +7,7 @@ import {
   createDeck,
   getAllDecks,
   getDeckById,
+  updateDeckById,
 } from './controllers/decks.controller';
 import { getUser } from './controllers/users.controller';
 import { verifyJWT } from './middlewares/verifyJWT';
@@ -181,5 +182,39 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     getDeckById,
+  );
+
+  app.put(
+    '/decks/:id',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        operationId: 'getDeckById',
+        params: z.object({
+          id: z.string().uuid(),
+        }),
+        body: z.object({
+          title: z.string().optional(),
+          description: z.string().optional(),
+          isPublic: z.boolean().optional(),
+        }),
+
+        response: {
+          200: z.object({
+            id: z.string(),
+            title: z.string(),
+            description: z.string().nullable(),
+            isPublic: z.boolean(),
+            createdAt: z.date(),
+            updatedAt: z.date(),
+          }),
+          400: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    updateDeckById,
   );
 };

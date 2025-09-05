@@ -27,11 +27,12 @@ export interface DecksRepository {
     page?: number;
     pageSize?: number;
   }): Promise<GetAllResponse>;
-  getById({
+  getById({ deckId }: { deckId: string }): Promise<Omit<Deck, 'userId'> | null>;
+  update({
+    data,
     deckId,
-    userId,
   }: {
+    data: Prisma.DeckUpdateInput;
     deckId: string;
-    userId: string;
   }): Promise<Omit<Deck, 'userId'> | null>;
 }

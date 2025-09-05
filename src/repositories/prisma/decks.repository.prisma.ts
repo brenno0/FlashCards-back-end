@@ -11,14 +11,11 @@ import type {
 export class DecksPrismaRepository implements DecksRepository {
   async getById({
     deckId,
-    userId,
   }: {
     deckId: string;
-    userId: string;
   }): Promise<Omit<Deck, 'userId'> | null> {
     const deck = await prisma.deck.findUnique({
       where: {
-        userId,
         id: deckId,
       },
       omit: {
@@ -96,6 +93,23 @@ export class DecksPrismaRepository implements DecksRepository {
         isPublic: true,
         title: true,
         updatedAt: true,
+      },
+    });
+
+    return deck;
+  }
+  async update({
+    data,
+    deckId,
+  }: {
+    data: Prisma.DeckUpdateInput;
+    deckId: string;
+    userId: string;
+  }): Promise<Omit<Deck, 'userId'> | null> {
+    const deck = await prisma.deck.update({
+      data,
+      where: {
+        id: deckId,
       },
     });
 

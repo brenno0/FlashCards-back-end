@@ -6,6 +6,7 @@ import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { makeCreateDeck } from '@/use-cases/factories/make-create-deck';
 import { makeGetAllDecks } from '@/use-cases/factories/make-get-all-decks';
 import { makeGetDeckById } from '@/use-cases/factories/make-get-deck-by-id';
+import { makeUpdateDeckById } from '@/use-cases/factories/make-update-deck-by-id';
 
 export const createDeck = async (
   request: FastifyRequest,
@@ -95,13 +96,51 @@ export const getDeckById = async (
 
     const { id } = registerBodySchema.parse(request.params);
 
-    const { sub: userId } = request.user;
-
     const { deck } = await getByIdDeckUseCase.handle({
       deckId: id,
-      userId,
     });
     return reply.status(200).send(deck);
+  } catch (error) {
+    if (error instanceof Error || error instanceof ResourceNotFoundError) {
+      reply.status(400).send({
+        message: error.message,
+        error: 'ResourceAlreadyExistsError',
+      });
+    }
+  }
+};
+
+export const updateDeckById = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { updateDeckById } = makeUpdateDeckById();
+
+    const decksParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    const decksBodySchema = z.object({
+      description: z.string().optional(),
+      title: z.string().optional(),
+      isPublic: z.boolean().optional(),
+    });
+
+    const { id } = decksParamsSchema.parse(request.params);
+    const { description, isPublic, title } = decksBodySchema.parse(
+      request.body,
+    );
+
+    const { updatedDeck } = await updateDeckById.handle({
+      deckId: id,
+      data: {
+        description,
+        isPublic,
+        title,
+      },
+    });
+    return reply.status(200).send(updatedDeck);
   } catch (error) {
     if (error instanceof Error || error instanceof ResourceNotFoundError) {
       reply.status(400).send({
