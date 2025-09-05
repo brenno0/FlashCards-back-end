@@ -17,7 +17,7 @@ Endpoints sugeridos:
 
 [X] GET /decks → listar baralhos do usuário autenticado
 
-GET /decks/:id → detalhes de 1 baralho
+[X] GET /decks/:id → detalhes de 1 baralho
 
 PUT /decks/:id → editar baralho
 

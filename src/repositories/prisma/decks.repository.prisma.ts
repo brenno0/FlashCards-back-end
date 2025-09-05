@@ -9,6 +9,26 @@ import type {
 } from '../decks-repository';
 
 export class DecksPrismaRepository implements DecksRepository {
+  async getById({
+    deckId,
+    userId,
+  }: {
+    deckId: string;
+    userId: string;
+  }): Promise<Omit<Deck, 'userId'> | null> {
+    const deck = await prisma.deck.findUnique({
+      where: {
+        userId,
+        id: deckId,
+      },
+      omit: {
+        userId: true,
+      },
+    });
+
+    return deck;
+  }
+
   async getAll({
     userId,
     filters,
