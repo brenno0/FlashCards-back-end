@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.3.0...v2.4.0) (2025-09-05)
+
+
+### Features
+
+* **criação de findbyid:** criação de findById ([f44a16c](https://github.com/brenno0/FlashCards-back-end/commit/f44a16cc62d4b8fe054299b4af0b47cf648602bb))
+
 ## [2.3.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.2.3...v2.3.0) (2025-09-04)
 
 
