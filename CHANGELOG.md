@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.4.0...v2.5.0) (2025-09-06)
+
+
+### Features
+
+* adicionando deleção de decks ([03f48e0](https://github.com/brenno0/FlashCards-back-end/commit/03f48e0827fbc6066926d7a594688d5db469491b))
+* criando edição de deck ([21ad57b](https://github.com/brenno0/FlashCards-back-end/commit/21ad57bc8050f72c9d037e0d5748ca07d08dca29))
+
 ## [2.4.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.3.0...v2.4.0) (2025-09-05)
 
 
