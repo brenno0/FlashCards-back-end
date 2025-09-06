@@ -4,6 +4,7 @@ import z from 'zod';
 import { ResourceAlreadyExists } from '@/use-cases/errors/resourceAlreadyExists';
 import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { makeCreateDeck } from '@/use-cases/factories/make-create-deck';
+import { makeDeleteDeckById } from '@/use-cases/factories/make-delete-deck-by-id';
 import { makeGetAllDecks } from '@/use-cases/factories/make-get-all-decks';
 import { makeGetDeckById } from '@/use-cases/factories/make-get-deck-by-id';
 import { makeUpdateDeckById } from '@/use-cases/factories/make-update-deck-by-id';
@@ -141,6 +142,30 @@ export const updateDeckById = async (
       },
     });
     return reply.status(200).send(updatedDeck);
+  } catch (error) {
+    if (error instanceof Error || error instanceof ResourceNotFoundError) {
+      reply.status(400).send({
+        message: error.message,
+        error: 'ResourceAlreadyExistsError',
+      });
+    }
+  }
+};
+
+export const deleteDeckById = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { deleteDecksByIdUseCase } = makeDeleteDeckById();
+    const decksParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    const { id } = decksParamsSchema.parse(request.params);
+
+    await deleteDecksByIdUseCase.handle({ deckId: id });
+    return reply.status(200).send('Deck deletado com sucesso');
   } catch (error) {
     if (error instanceof Error || error instanceof ResourceNotFoundError) {
       reply.status(400).send({

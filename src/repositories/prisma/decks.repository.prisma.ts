@@ -115,4 +115,12 @@ export class DecksPrismaRepository implements DecksRepository {
 
     return deck;
   }
+
+  async delete({ deckId }: { deckId: string }): Promise<void> {
+    await prisma.deck.delete({
+      where: {
+        id: deckId,
+      },
+    });
+  }
 }

@@ -35,4 +35,5 @@ export interface DecksRepository {
     data: Prisma.DeckUpdateInput;
     deckId: string;
   }): Promise<Omit<Deck, 'userId'> | null>;
+  delete({ deckId }: { deckId: string }): Promise<void>;
 }

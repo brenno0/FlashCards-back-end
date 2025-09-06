@@ -19,9 +19,9 @@ Endpoints sugeridos:
 
 [X] GET /decks/:id → detalhes de 1 baralho
 
-PUT /decks/:id → editar baralho
+[X] PUT /decks/:id → editar baralho
 
-DELETE /decks/:id → excluir
+[] DELETE /decks/:id → excluir
 
 3. Flashcards
 
