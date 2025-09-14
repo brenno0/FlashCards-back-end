@@ -29,7 +29,7 @@ CRUD de flashcards dentro de decks.
 
 Endpoints sugeridos:
 
-POST /decks/:deckId/flashcards → criar card
+[X] POST /decks/:deckId/flashcards → criar card
 
 GET /decks/:deckId/flashcards → listar cards do baralho
 
