@@ -5,6 +5,7 @@ import type { FastifyTypedInstance } from '@/@types/fastifyTypes';
 import { authenticate, createUser } from './controllers/auth.controller';
 import {
   createDeck,
+  deleteDeckById,
   getAllDecks,
   getDeckById,
   updateDeckById,
@@ -189,7 +190,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     {
       onRequest: [verifyJWT],
       schema: {
-        operationId: 'getDeckById',
+        operationId: 'updateDeck',
         params: z.object({
           id: z.string().uuid(),
         }),
@@ -216,5 +217,26 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     updateDeckById,
+  );
+
+  app.delete(
+    '/decks/:id',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        operationId: 'deleteDeck',
+        params: z.object({
+          id: z.string().uuid(),
+        }),
+        response: {
+          200: {},
+          400: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    deleteDeckById,
   );
 };

@@ -10,7 +10,7 @@ export class DeleteDeckByIdUseCase {
       deckId,
     });
 
-    if (deck?.id) {
+    if (!deck?.id) {
       throw new ResourceNotFoundError({ resource: 'Deck' });
     }
 

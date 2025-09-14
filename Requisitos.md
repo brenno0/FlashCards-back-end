@@ -21,7 +21,7 @@ Endpoints sugeridos:
 
 [X] PUT /decks/:id → editar baralho
 
-[] DELETE /decks/:id → excluir
+[X] DELETE /decks/:id → excluir
 
 3. Flashcards
 

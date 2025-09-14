@@ -170,7 +170,7 @@ export const deleteDeckById = async (
     if (error instanceof Error || error instanceof ResourceNotFoundError) {
       reply.status(400).send({
         message: error.message,
-        error: 'ResourceAlreadyExistsError',
+        error: 'ResourceNotFoundError',
       });
     }
   }
