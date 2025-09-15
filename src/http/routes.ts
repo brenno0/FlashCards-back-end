@@ -10,6 +10,10 @@ import {
   getDeckById,
   updateDeckById,
 } from './controllers/decks.controller';
+import {
+  createFlashCard,
+  getFlashCardUseCase,
+} from './controllers/flashcards.controller';
 import { getUser } from './controllers/users.controller';
 import { verifyJWT } from './middlewares/verifyJWT';
 
@@ -18,6 +22,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     '/auth/sign-up',
     {
       schema: {
+        tags: ['Auth'],
         operationId: 'createUser',
         body: z.object({
           name: z.string(),
@@ -46,6 +51,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     '/auth/sign-in',
     {
       schema: {
+        tags: ['Auth'],
         operationId: 'authUser',
         body: z.object({
           email: z.string(),
@@ -73,6 +79,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     {
       onRequest: [verifyJWT],
       schema: {
+        tags: ['User'],
         operationId: 'getUser',
         response: {
           200: z.object({
@@ -97,6 +104,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     {
       onRequest: [verifyJWT],
       schema: {
+        tags: ['Decks'],
         operationId: 'createDecks',
         response: {
           200: z.object({
@@ -122,6 +130,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     {
       onRequest: [verifyJWT],
       schema: {
+        tags: ['Decks'],
         operationId: 'getAllDecks',
         querystring: z.object({
           title: z.string().optional().nullable(),
@@ -161,6 +170,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     {
       onRequest: [verifyJWT],
       schema: {
+        tags: ['Decks'],
         operationId: 'getDeckById',
         params: z.object({
           id: z.string().uuid(),
@@ -190,6 +200,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     {
       onRequest: [verifyJWT],
       schema: {
+        tags: ['Decks'],
         operationId: 'updateDeck',
         params: z.object({
           id: z.string().uuid(),
@@ -224,12 +235,13 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     {
       onRequest: [verifyJWT],
       schema: {
+        tags: ['Decks'],
         operationId: 'deleteDeck',
         params: z.object({
           id: z.string().uuid(),
         }),
         response: {
-          200: {},
+          200: z.object({}),
           400: z.object({
             error: z.string(),
             message: z.string(),
@@ -238,5 +250,70 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     deleteDeckById,
+  );
+  // Flashcards
+
+  app.post(
+    '/decks/:deckId/flashcards',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Flashcards'],
+        operationId: 'createFlashcard',
+        params: z.object({
+          deckId: z.string().uuid(),
+        }),
+        body: z.object({
+          front: z.string(),
+          back: z.string(),
+        }),
+        response: {
+          201: z.object({
+            id: z.string().uuid(),
+            front: z.string(),
+            back: z.string(),
+            deckId: z.string().uuid(),
+            createdAt: z.date(),
+            updatedAt: z.date(),
+          }),
+          404: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    createFlashCard,
+  );
+
+  app.get(
+    `/decks/:deckId/flashcards`,
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Flashcards'],
+        operationId: 'getFlashCards',
+        params: z.object({
+          deckId: z.string().uuid(),
+        }),
+        response: {
+          200: z.array(
+            z.object({
+              id: z.string().uuid(),
+              front: z.string().nullable(),
+              back: z.string(),
+              deckId: z.string().uuid(),
+              createdAt: z.date(),
+              updatedAt: z.date(),
+            }),
+          ),
+          404: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    getFlashCardUseCase,
   );
 };

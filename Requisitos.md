@@ -31,7 +31,7 @@ Endpoints sugeridos:
 
 [X] POST /decks/:deckId/flashcards → criar card
 
-GET /decks/:deckId/flashcards → listar cards do baralho
+[X] GET /decks/:deckId/flashcards → listar cards do baralho
 
 PUT /flashcards/:id → editar card
 

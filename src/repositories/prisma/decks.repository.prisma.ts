@@ -18,6 +18,11 @@ export class DecksPrismaRepository implements DecksRepository {
       where: {
         id: deckId,
       },
+      include: {
+        flashcards: true,
+        tags: true,
+        studySessions: true,
+      },
       omit: {
         userId: true,
       },
