@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.5.0...v2.6.0) (2025-09-15)
+
+
+### Features
+
+* criação de flashcards ([6730ba6](https://github.com/brenno0/FlashCards-back-end/commit/6730ba63fca58cc3c7548e984235704f099ef933))
+* **criando deleção de decks:** criando deleção de decks ([8b82815](https://github.com/brenno0/FlashCards-back-end/commit/8b828158978ec1fbd09277aa2046aa45aa25a24d))
+* flashcards list ([c6fd1a2](https://github.com/brenno0/FlashCards-back-end/commit/c6fd1a21f017a281a4be52c69edf6e0350de321d))
+
 ## [2.5.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.4.0...v2.5.0) (2025-09-06)
 
 
