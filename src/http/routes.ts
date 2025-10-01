@@ -12,7 +12,8 @@ import {
 } from './controllers/decks.controller';
 import {
   createFlashCard,
-  getFlashCardUseCase,
+  editFlashCard,
+  getFlashCard,
 } from './controllers/flashcards.controller';
 import { getUser } from './controllers/users.controller';
 import { verifyJWT } from './middlewares/verifyJWT';
@@ -314,6 +315,39 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
         },
       },
     },
-    getFlashCardUseCase,
+    getFlashCard,
+  );
+
+  app.put(
+    `/flashcards/:id`,
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Flashcards'],
+        operationId: 'getFlashCards',
+        params: z.object({
+          id: z.string().uuid(),
+        }),
+        body: z.object({
+          front: z.string().optional(),
+          back: z.string().optional(),
+        }),
+        response: {
+          200: z.object({
+            id: z.string().uuid(),
+            front: z.string().optional(),
+            back: z.string().optional(),
+            deckId: z.string().uuid(),
+            createdAt: z.date(),
+            updatedAt: z.date(),
+          }),
+          404: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    editFlashCard,
   );
 };
