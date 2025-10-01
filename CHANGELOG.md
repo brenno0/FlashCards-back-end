@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.7.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.6.0...v2.7.0) (2025-10-01)
+
+
+### Features
+
+* criação de endpoint para edição de flashcard ([ce164dd](https://github.com/brenno0/FlashCards-back-end/commit/ce164dd273fd24b1245b21a5b3c1a394d16d386e))
+
 ## [2.6.0](https://github.com/brenno0/FlashCards-back-end/compare/v2.5.0...v2.6.0) (2025-09-15)
 
 
