@@ -7,6 +7,7 @@ import { makeCreateFlashCards } from '@/use-cases/factories/make-create-flashcar
 import { makeDeleteFlashcard } from '@/use-cases/factories/make-delete-flashcard';
 import { makeEditFlashCard } from '@/use-cases/factories/make-edit-flashcard';
 import { makeGetFlashCard } from '@/use-cases/factories/make-get-flashcard';
+import { makeUpdateFlashcardsProgress } from '@/use-cases/factories/make-update-flashcards-progress';
 
 export const createFlashCard = async (
   request: FastifyRequest,
@@ -126,5 +127,42 @@ export const deleteFlashCard = async (
         error: 'ResourceNotFoundError',
       });
     }
+  }
+};
+
+export const updateFlashcardsProgress = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { updateFlashcardProgressUseCase } = makeUpdateFlashcardsProgress();
+    const updateFlashcardsProgressParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+    const answerFlashcardBodySchema = z.object({
+      quality: z.number().min(0).max(5),
+    });
+
+    const { id: flashcardId } = updateFlashcardsProgressParamsSchema.parse(
+      request.params,
+    );
+    const { quality } = answerFlashcardBodySchema.parse(request.body);
+
+    const userId = request.user.sub;
+
+    const progress = await updateFlashcardProgressUseCase.handle({
+      flashcardId,
+      userId,
+      quality,
+    });
+
+    return reply.status(200).send(progress);
+  } catch (err) {
+    console.log('ERRO', err);
+    reply.status(500).send({
+      message: 'Erro interno no servidor',
+      details: err,
+      error: 'InternalServerError',
+    });
   }
 };

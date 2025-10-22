@@ -15,6 +15,7 @@ import {
   deleteFlashCard,
   editFlashCard,
   getFlashCard,
+  updateFlashcardsProgress,
 } from './controllers/flashcards.controller';
 import { getUser } from './controllers/users.controller';
 import { verifyJWT } from './middlewares/verifyJWT';
@@ -376,5 +377,40 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     deleteFlashCard,
+  );
+
+  app.post(
+    `/flashcards/:id/answer`,
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Flashcards'],
+        operationId: 'answerFlashCard',
+        params: z.object({
+          id: z.string().uuid(),
+        }),
+        body: z.object({
+          quality: z.number().nonnegative(),
+        }),
+        response: {
+          200: z.object({
+            status: z.enum(['NEW', 'LEARNED', 'REVIEW', 'AGAIN']),
+            id: z.string(),
+            userId: z.string(),
+            nextReviewAt: z.date(),
+            interval: z.number(),
+            repetitions: z.number(),
+            easeFactor: z.number(),
+            lastStudiedAt: z.date().nullable(),
+            flashcardId: z.string(),
+          }),
+          500: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    updateFlashcardsProgress,
   );
 };

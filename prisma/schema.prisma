@@ -66,17 +66,20 @@ model StudySession {
 
 model FlashcardProgress {
   id            String         @id @default(uuid())
-  status        ProgressStatus @default(NEW)
-  nextReviewAt  DateTime?
+  status        ProgressStatus @default(NEW) // Novo campo, muito útil!
+  nextReviewAt  DateTime       @default(now()) // Corresponde ao 'nextReview'
+  interval      Int            @default(0)
   repetitions   Int            @default(0)
   easeFactor    Float          @default(2.5)
-  lastStudiedAt DateTime?
+  lastStudiedAt DateTime? // Corresponde ao 'lastReviewed'
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   flashcard   Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
   flashcardId String
+
+  @@unique([userId, flashcardId])
 }
 
 model Tag {
