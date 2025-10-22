@@ -31,6 +31,16 @@ app.register(fastifySwagger, {
       title: 'BFinnance API',
       version: '1.0.0',
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Insira seu token JWT no formato: **Bearer <token>**',
+        },
+      },
+    },
   },
   transform: jsonSchemaTransform,
 });

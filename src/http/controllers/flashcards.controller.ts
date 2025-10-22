@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { makeCreateFlashCards } from '@/use-cases/factories/make-create-flashcards';
+import { makeDeleteFlashcard } from '@/use-cases/factories/make-delete-flashcard';
 import { makeEditFlashCard } from '@/use-cases/factories/make-edit-flashcard';
 import { makeGetFlashCard } from '@/use-cases/factories/make-get-flashcard';
 
@@ -57,8 +58,6 @@ export const getFlashCard = async (
       deckId,
     });
 
-    console.log(flashcards);
-
     return reply.status(200).send(flashcards);
   } catch (error: any) {
     if (error instanceof ResourceNotFoundError) {
@@ -93,9 +92,33 @@ export const editFlashCard = async (
       back,
     });
 
-    console.log(`flashcard`, flashcard);
-
     return reply.status(200).send(flashcard);
+  } catch (error: any) {
+    if (error instanceof ResourceNotFoundError) {
+      reply.status(404).send({
+        message: error.message,
+        error: 'ResourceNotFoundError',
+      });
+    }
+  }
+};
+
+export const deleteFlashCard = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { deleteFlashcardUseCase } = makeDeleteFlashcard();
+
+    const deleteFlashcardParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    const { id } = deleteFlashcardParamsSchema.parse(request.params);
+
+    await deleteFlashcardUseCase.handle({ id });
+
+    return reply.status(200);
   } catch (error: any) {
     if (error instanceof ResourceNotFoundError) {
       reply.status(404).send({

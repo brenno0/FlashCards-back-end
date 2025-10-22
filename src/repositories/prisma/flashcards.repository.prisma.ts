@@ -58,8 +58,6 @@ export class PrismaFlashCardsRepository implements FlashCardsRepository {
       data.back = back;
     }
 
-    console.log(`CHAMANDO 2`);
-
     const flashcard = await prisma.flashcard.update({
       where: {
         id: flashcardId,
@@ -74,8 +72,15 @@ export class PrismaFlashCardsRepository implements FlashCardsRepository {
         updatedAt: true,
       },
     });
-    console.log(`CHAMANDO 3`, flashcard);
 
     return flashcard;
+  }
+
+  async deleteFlashcardById({ id }: { id: string }): Promise<void> {
+    await prisma.flashcard.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

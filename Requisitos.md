@@ -33,9 +33,9 @@ Endpoints sugeridos:
 
 [X] GET /decks/:deckId/flashcards → listar cards do baralho
 
-PUT /flashcards/:id → editar card
+[X] PUT /flashcards/:id → editar card
 
-DELETE /flashcards/:id → excluir card
+[X] DELETE /flashcards/:id → excluir card
 
 4. Estudo (StudySession + Progress)
 
@@ -45,7 +45,7 @@ Marcar flashcard como “acertou” ou “errou” → atualiza o FlashcardProgr
 
 Endpoints sugeridos:
 
-POST /study-sessions/:deckId/start → cria sessão
+[] POST /study-sessions/:deckId/start → cria sessão
 
 POST /study-sessions/:id/finish → finaliza sessão
 

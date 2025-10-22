@@ -14,4 +14,6 @@ export interface FlashCardsRepository {
     back?: string | null;
     front?: string | null;
   }): Promise<Flashcard | null>;
+
+  deleteFlashcardById({ id }: { id: string }): Promise<void>;
 }

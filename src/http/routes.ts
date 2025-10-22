@@ -12,6 +12,7 @@ import {
 } from './controllers/decks.controller';
 import {
   createFlashCard,
+  deleteFlashCard,
   editFlashCard,
   getFlashCard,
 } from './controllers/flashcards.controller';
@@ -107,6 +108,11 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       schema: {
         tags: ['Decks'],
         operationId: 'createDecks',
+        body: z.object({
+          title: z.string(),
+          description: z.string().optional(),
+          isPublic: z.boolean().optional(),
+        }),
         response: {
           200: z.object({
             id: z.string(),
@@ -324,7 +330,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       onRequest: [verifyJWT],
       schema: {
         tags: ['Flashcards'],
-        operationId: 'getFlashCards',
+        operationId: 'editFlashCards',
         params: z.object({
           id: z.string().uuid(),
         }),
@@ -349,5 +355,26 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     editFlashCard,
+  );
+
+  app.delete(
+    `/flashcards/:id`,
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Flashcards'],
+        operationId: 'deleteFlashCard',
+        params: z.object({
+          id: z.string().uuid(),
+        }),
+        response: {
+          404: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    deleteFlashCard,
   );
 };
