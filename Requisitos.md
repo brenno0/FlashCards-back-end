@@ -47,7 +47,7 @@ Endpoints sugeridos:
 
 [X] POST /study-sessions/:deckId/start → cria sessão
 
-[]POST /study-sessions/:id/finish → finaliza sessão
+[X]POST /study-sessions/:id/finish → finaliza sessão
 
 [X] POST /flashcards/:id/answer → registra resposta do usuário (atualiza progress)
 
