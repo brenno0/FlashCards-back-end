@@ -45,9 +45,9 @@ Marcar flashcard como “acertou” ou “errou” → atualiza o FlashcardProgr
 
 Endpoints sugeridos:
 
-[] POST /study-sessions/:deckId/start → cria sessão
+[X] POST /study-sessions/:deckId/start → cria sessão
 
-POST /study-sessions/:id/finish → finaliza sessão
+[]POST /study-sessions/:id/finish → finaliza sessão
 
 [X] POST /flashcards/:id/answer → registra resposta do usuário (atualiza progress)
 

@@ -17,7 +17,10 @@ import {
   getFlashCard,
   updateFlashcardsProgress,
 } from './controllers/flashcards.controller';
-import { startStudySession } from './controllers/study-session';
+import {
+  finishStudySession,
+  startStudySession,
+} from './controllers/study-session';
 import { getUser } from './controllers/users.controller';
 import { verifyJWT } from './middlewares/verifyJWT';
 
@@ -447,5 +450,31 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     startStudySession,
+  );
+  app.post(
+    `/study-sessions/:id/finish`,
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['study-session'],
+        operationId: 'startStudySession',
+        params: z.object({
+          id: z.string().uuid(),
+        }),
+        response: {
+          200: z.object({
+            id: z.string(),
+            deckId: z.string(),
+            finishedAt: z.date(),
+            startedAt: z.date().nullable(),
+          }),
+          500: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    finishStudySession,
   );
 };
