@@ -72,13 +72,20 @@ export class StartStudySessionUseCase {
       });
     }
 
-    const studySession = this.studySessionsRepository.create({
+    const studySession = await this.studySessionsRepository.create({
       deckId,
       userId,
       startedAt: new Date(),
     });
 
-    return studySession;
+    return {
+      ...studySession,
+      flashcards: sessionFlashcards.map((card) => ({
+        id: card.id,
+        front: card.front,
+        back: card.back,
+      })),
+    };
   }
 
   private async getFlashcardsForTodaysReview({

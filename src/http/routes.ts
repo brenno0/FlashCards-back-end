@@ -17,6 +17,7 @@ import {
   getFlashCard,
   updateFlashcardsProgress,
 } from './controllers/flashcards.controller';
+import { startStudySession } from './controllers/study-session';
 import { getUser } from './controllers/users.controller';
 import { verifyJWT } from './middlewares/verifyJWT';
 
@@ -422,7 +423,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
         tags: ['study-session'],
         operationId: 'startStudySession',
         params: z.object({
-          id: z.string().uuid(),
+          deckId: z.string().uuid(),
         }),
         response: {
           200: z.object({
@@ -430,6 +431,13 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
             deckId: z.string(),
             finishedAt: z.date().nullable(),
             startedAt: z.date().nullable(),
+            flashcards: z.array(
+              z.object({
+                id: z.string().uuid(),
+                front: z.string(),
+                back: z.string(),
+              }),
+            ),
           }),
           500: z.object({
             error: z.string(),
@@ -438,6 +446,6 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
         },
       },
     },
-    updateFlashcardsProgress,
+    startStudySession,
   );
 };
