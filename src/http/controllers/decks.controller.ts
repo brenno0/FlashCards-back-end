@@ -96,9 +96,10 @@ export const getDeckById = async (
     });
 
     const { id } = registerBodySchema.parse(request.params);
-
+    const { sub } = request.user;
     const { deck } = await getByIdDeckUseCase.handle({
       deckId: id,
+      userId: sub,
     });
     return reply.status(200).send(deck);
   } catch (error) {
@@ -132,6 +133,7 @@ export const updateDeckById = async (
     const { description, isPublic, title } = decksBodySchema.parse(
       request.body,
     );
+    const { sub } = request.user;
 
     const { updatedDeck } = await updateDeckById.handle({
       deckId: id,
@@ -140,6 +142,7 @@ export const updateDeckById = async (
         isPublic,
         title,
       },
+      userId: sub,
     });
     return reply.status(200).send(updatedDeck);
   } catch (error) {
@@ -164,7 +167,9 @@ export const deleteDeckById = async (
 
     const { id } = decksParamsSchema.parse(request.params);
 
-    await deleteDecksByIdUseCase.handle({ deckId: id });
+    const { sub } = request.user;
+
+    await deleteDecksByIdUseCase.handle({ deckId: id, userId: sub });
     return reply.status(200).send('Deck deletado com sucesso');
   } catch (error) {
     if (error instanceof Error || error instanceof ResourceNotFoundError) {

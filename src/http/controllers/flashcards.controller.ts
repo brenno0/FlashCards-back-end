@@ -26,11 +26,13 @@ export const createFlashCard = async (
     });
     const { deckId } = createFlashCardParamsSchema.parse(request.params);
     const { front, back } = createFlashCardBodySchema.parse(request.body);
+    const { sub } = request.user;
 
     const { flashcard } = await createFlashCardUseCase.execute({
       front,
       back,
       deckId,
+      userId: sub,
     });
     return reply.status(201).send(flashcard);
   } catch (error: any) {
@@ -54,9 +56,11 @@ export const getFlashCard = async (
       deckId: z.string().uuid(),
     });
     const { deckId } = getFlashCardsBodySchema.parse(request.params);
+    const { sub } = request.user;
 
     const { flashcards } = await getFlashCardsUseCase.execute({
       deckId,
+      userId: sub,
     });
 
     return reply.status(200).send(flashcards);

@@ -5,6 +5,37 @@ import type { Prisma, Flashcard } from 'generated/prisma';
 import type { FlashCardsRepository } from '../flashcards-repository';
 
 export class PrismaFlashCardsRepository implements FlashCardsRepository {
+  async findManyWithNoProgress({
+    deckId,
+    userId,
+    quantityOfCardsToTake,
+    existingFlashcardIds,
+  }: {
+    deckId: string;
+    userId: string;
+    quantityOfCardsToTake: number;
+    existingFlashcardIds: string[];
+  }): Promise<Flashcard[]> {
+    const flashcards = await prisma.flashcard.findMany({
+      where: {
+        deckId,
+
+        NOT: {
+          id: {
+            in: existingFlashcardIds,
+          },
+        },
+        progress: {
+          none: {
+            userId,
+          },
+        },
+      },
+      take: 20 - quantityOfCardsToTake,
+    });
+
+    return flashcards;
+  }
   async getById({
     flashcardId,
   }: {

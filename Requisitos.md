@@ -49,7 +49,7 @@ Endpoints sugeridos:
 
 POST /study-sessions/:id/finish → finaliza sessão
 
-POST /flashcards/:id/answer → registra resposta do usuário (atualiza progress)
+[X] POST /flashcards/:id/answer → registra resposta do usuário (atualiza progress)
 
 5. Progresso e Repetição espaçada
 

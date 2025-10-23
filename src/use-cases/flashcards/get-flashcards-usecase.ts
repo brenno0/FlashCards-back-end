@@ -9,9 +9,10 @@ export class GetFlashCardsUseCase {
     private readonly decksRepository: DecksRepository,
   ) {}
 
-  async execute({ deckId }: { deckId: string }) {
+  async execute({ deckId, userId }: { deckId: string; userId: string }) {
     const deck = await this.decksRepository.getById({
       deckId,
+      userId,
     });
 
     if (!deck) {

@@ -1,10 +1,45 @@
 import { prisma } from '@/lib/prisma';
 import type { FlashcardProgress, Prisma } from 'generated/prisma';
 
-import type { FlashcardsProgressRepository } from '../flashcard-progress-repository';
+import type {
+  FlashcardProgressWithFlashcard,
+  FlashcardsProgressRepository,
+} from '../flashcard-progress-repository';
 
 export class FlashcardsProgressPrismaRepository
-  implements FlashcardsProgressRepository {
+  implements FlashcardsProgressRepository
+{
+  async findMany({
+    userId,
+    deckId,
+    nextReviewAt,
+  }: {
+    userId: string;
+    deckId: string;
+    nextReviewAt: Date;
+  }): Promise<FlashcardProgressWithFlashcard[]> {
+    const progress = await prisma.flashcardProgress.findMany({
+      where: {
+        userId,
+        flashcard: {
+          deckId,
+        },
+        nextReviewAt: {
+          lte: nextReviewAt,
+        },
+      },
+      include: {
+        flashcard: true,
+      },
+      orderBy: {
+        nextReviewAt: 'asc',
+      },
+      take: 10,
+    });
+
+    return progress;
+  }
+
   async findUnique({
     userId,
     flashcardId,

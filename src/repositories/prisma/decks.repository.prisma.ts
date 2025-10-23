@@ -11,12 +11,15 @@ import type {
 export class DecksPrismaRepository implements DecksRepository {
   async getById({
     deckId,
+    userId,
   }: {
     deckId: string;
+    userId: string;
   }): Promise<Omit<Deck, 'userId'> | null> {
     const deck = await prisma.deck.findUnique({
       where: {
         id: deckId,
+        userId,
       },
       include: {
         flashcards: true,

@@ -413,4 +413,31 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     },
     updateFlashcardsProgress,
   );
+
+  app.post(
+    `/study-sessions/:deckId/start`,
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['study-session'],
+        operationId: 'startStudySession',
+        params: z.object({
+          id: z.string().uuid(),
+        }),
+        response: {
+          200: z.object({
+            id: z.string(),
+            deckId: z.string(),
+            finishedAt: z.date().nullable(),
+            startedAt: z.date().nullable(),
+          }),
+          500: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    updateFlashcardsProgress,
+  );
 };

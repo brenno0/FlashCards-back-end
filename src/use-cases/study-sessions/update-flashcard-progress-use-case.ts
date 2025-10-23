@@ -1,4 +1,5 @@
-import type { $Enums, FlashcardProgress, Prisma } from 'generated/prisma'; // Importando os tipos necessários
+import type { FlashcardsProgressRepository } from '@/repositories/flashcard-progress-repository';
+import type { $Enums, FlashcardProgress } from 'generated/prisma'; // Importando os tipos necessários
 
 export interface FlashcardProgressIdentifier {
   flashcardId: string;
@@ -7,7 +8,7 @@ export interface FlashcardProgressIdentifier {
 
 export interface UpdateFlashcardProgressRequest
   extends FlashcardProgressIdentifier {
-  quality: number; // Qualidade da resposta do usuário (0-5)
+  quality: number;
 }
 
 type CalculatedFlashcardProgressValues = Pick<
@@ -160,18 +161,4 @@ export class UpdateFlashcardProgressUseCase {
       status: newStatus,
     };
   }
-}
-
-export interface FlashcardsProgressRepository {
-  findUnique({
-    userId,
-    flashcardId,
-  }: FlashcardProgressIdentifier): Promise<FlashcardProgress | null>;
-  create(
-    data: Prisma.FlashcardProgressUncheckedCreateInput,
-  ): Promise<FlashcardProgress>;
-  update(
-    id: string,
-    data: Prisma.FlashcardProgressUncheckedUpdateInput,
-  ): Promise<FlashcardProgress>;
 }

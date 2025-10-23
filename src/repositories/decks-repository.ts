@@ -27,7 +27,13 @@ export interface DecksRepository {
     page?: number;
     pageSize?: number;
   }): Promise<GetAllResponse>;
-  getById({ deckId }: { deckId: string }): Promise<Omit<Deck, 'userId'> | null>;
+  getById({
+    deckId,
+    userId,
+  }: {
+    deckId: string;
+    userId: string;
+  }): Promise<Omit<Deck, 'userId'> | null>;
   update({
     data,
     deckId,

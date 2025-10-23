@@ -7,6 +7,7 @@ interface CreateFlashCardsRequest {
   front: string;
   back: string;
   deckId: string;
+  userId: string;
 }
 
 export class CreateFlashcardsUseCase {
@@ -15,9 +16,10 @@ export class CreateFlashcardsUseCase {
     private readonly decksRepository: DecksRepository,
   ) {}
 
-  async execute({ front, back, deckId }: CreateFlashCardsRequest) {
+  async execute({ front, back, deckId, userId }: CreateFlashCardsRequest) {
     const deck = await this.decksRepository.getById({
       deckId,
+      userId,
     });
 
     if (!deck) {
