@@ -457,7 +457,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       onRequest: [verifyJWT],
       schema: {
         tags: ['study-session'],
-        operationId: 'startStudySession',
+        operationId: 'finishStudySession',
         params: z.object({
           id: z.string().uuid(),
         }),
