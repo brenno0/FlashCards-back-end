@@ -5,7 +5,7 @@ services:
     region: oregon # ou sua região preferida
     plan: free # ou starter/standard
     buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npx prisma migrate deploy && node dist/server.js
+    startCommand: npx prisma migrate deploy && npm run start
     envVars:
       - key: DATABASE_URL
         fromDatabase:
