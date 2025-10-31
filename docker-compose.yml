@@ -1,11 +1,49 @@
 version: '3'
 
 services:
-    BFlashCardsDB:
-        image: 'bitnami/postgresql'
-        ports:
-            - 5432:5432
-        environment:
-            - POSTGRESQL_USERNAME=docker
-            - POSTGRESQL_PASSWORD=docker
-            - POSTGRESQL_DATABASE=bflashcards
+  bflashcards-database:
+    image: 'bitnami/postgresql'
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=bflashcards
+    networks: 
+      - bflashcards-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docker -d bflashcards "]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  bflashcards-back-end: 
+    build: 
+      context: .
+    ports:
+      - 3333:3333
+    container_name: "nb-flix-backend"
+    depends_on: 
+      bflashcards-database:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "Running Prisma migrations..."
+        npx prisma migrate deploy --schema=./prisma/schema.prisma # migrate deploy é não-interativo e ideal para produção/startup
+        echo "Migrations applied. Starting application..."
+        exec node dist/server.js # Inicia sua aplicação Fastify
+    networks: 
+      - bflashcards-network
+    command: >
+      sh -c "
+        npx prisma migrate deploy &&
+        node dist/server.js
+      "
+
+networks:
+  bflashcards-network:
+    name: bflashcards-network
+    driver: bridge
+    external: true
