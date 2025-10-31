@@ -1,10 +1,10 @@
 {
     "name": "bfinnances",
-    "version": "3.0.6",
+    "version": "3.0.7",
     "main": "index.js",
     "scripts": {
         "dev": "tsx watch src/server.ts",
-        "start":"node build/server.js",
+        "start": "node build/server.js",
         "test": "vitest run",
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
