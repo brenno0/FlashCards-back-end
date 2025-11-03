@@ -66,6 +66,8 @@ export class DecksPrismaRepository implements DecksRepository {
       where,
       include: {
         _count: true,
+        studySessions: true,
+        tags: true,
       },
       take: pageSize,
       skip: (page - 1) * pageSize,
