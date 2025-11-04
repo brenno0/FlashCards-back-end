@@ -20,6 +20,7 @@ import { prisma } from './lib/prisma';
 export const app = fastify().withTypeProvider<ZodTypeProvider>();
 app.register(cors, {
   allowedHeaders: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 });
 
 app.setValidatorCompiler(validatorCompiler);
