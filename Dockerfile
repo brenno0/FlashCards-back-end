@@ -1,31 +1,31 @@
-FROM node:24.10.0-alpine AS build
+FROM node:24-alpine AS build
 
-WORKDIR /usr/src/bflashcards-backend
+RUN apk add --no-cache openssl
+
+WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 COPY . .
 
-RUN npm run build
-
-RUN rm -rf node_modules
-RUN npm ci --omit=dev
-RUN npx prisma generate
+RUN npx prisma generate && npm run build
+RUN npm prune --omit=dev --ignore-scripts
 
 
-FROM node:24.10.0-alpine AS start
+FROM node:24-alpine AS runtime
 
-WORKDIR /usr/src/bflashcards-backend
+RUN apk add --no-cache openssl
 
-COPY --from=build /usr/src/bflashcards-backend/dist ./dist
-COPY --from=build /usr/src/bflashcards-backend/node_modules ./node_modules
-COPY --from=build /usr/src/bflashcards-backend/package.json ./package.json
-COPY --from=build /usr/src/bflashcards-backend/.env ./.env
-COPY --from=build /usr/src/bflashcards-backend/prisma ./prisma
-COPY --from=build /usr/src/bflashcards-backend/generated ./generated
+WORKDIR /app
+ENV NODE_ENV=production
 
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/build ./build
+COPY --from=build /app/generated ./generated
+COPY --from=build /app/prisma ./prisma
 
 EXPOSE 3333
 
-CMD ["node", "dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && exec node build/server.js"]
