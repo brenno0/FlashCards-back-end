@@ -1,3 +1,4 @@
+import type { BoardAssetsRepository } from '@/repositories/board-assets-repository';
 import type { BoardsRepository } from '@/repositories/boards-repository';
 
 import { BoardContentTooLargeError } from '../errors/boardContentTooLarge';
@@ -20,7 +21,10 @@ interface SaveBoardContentUseCaseRequest {
 }
 
 export class SaveBoardContentUseCase {
-  constructor(private readonly boardsRepository: BoardsRepository) {}
+  constructor(
+    private readonly boardsRepository: BoardsRepository,
+    private readonly boardAssetsRepository: BoardAssetsRepository,
+  ) {}
 
   async handle({
     boardId,
@@ -81,6 +85,12 @@ export class SaveBoardContentUseCase {
       }
       throw new BoardVersionConflictError(current.version);
     }
+
+    await this.boardAssetsRepository.syncOrphans({
+      boardId,
+      referencedIds: referencedAssetIds,
+      now: new Date(),
+    });
 
     return { version: newVersion };
   }

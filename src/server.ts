@@ -1,5 +1,6 @@
 import { app } from './app';
 import { env } from './env';
+import { startCleanupOrphanedAssetsJob } from './jobs/cleanup-orphaned-assets-job';
 
 app
   .listen({
@@ -8,4 +9,5 @@ app
   })
   .then(() => {
     console.log('Server is running!');
+    startCleanupOrphanedAssetsJob();
   });

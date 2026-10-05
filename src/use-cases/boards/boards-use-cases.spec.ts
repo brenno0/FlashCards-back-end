@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { InMemoryStorageProvider } from '@/lib/storage/in-memory-storage-provider';
+import { InMemoryBoardAssetsRepository } from '@/repositories/in-memory/in-memory-board-assets-repository';
 import { InMemoryBoardsRepository } from '@/repositories/in-memory/in-memory-boards-repository';
 import { InMemoryDecksRepository } from '@/repositories/in-memory/in-memory-decks-repository';
 
@@ -23,6 +25,8 @@ const OTHER_USER = 'user-2';
 
 let boards: InMemoryBoardsRepository;
 let decks: InMemoryDecksRepository;
+let assets: InMemoryBoardAssetsRepository;
+let storage: InMemoryStorageProvider;
 
 const sectionDoc = {
   ...EMPTY_BOARD_DOCUMENT,
@@ -47,6 +51,8 @@ const sectionDoc = {
 beforeEach(() => {
   boards = new InMemoryBoardsRepository();
   decks = new InMemoryDecksRepository();
+  assets = new InMemoryBoardAssetsRepository();
+  storage = new InMemoryStorageProvider();
 });
 
 const createBoard = (userId = USER, deckId?: string) =>
@@ -117,7 +123,7 @@ describe('SaveBoardContentUseCase', () => {
     version: number,
     userId = USER,
   ) =>
-    new SaveBoardContentUseCase(boards).handle({
+    new SaveBoardContentUseCase(boards, assets).handle({
       boardId,
       userId,
       content,
@@ -247,7 +253,7 @@ describe('UpdateBoardMetaUseCase', () => {
 describe('DeleteBoardUseCase', () => {
   it('deletes own board, then it is not found', async () => {
     const { board } = await createBoard();
-    await new DeleteBoardUseCase(boards).handle({
+    await new DeleteBoardUseCase(boards, assets, storage).handle({
       boardId: board.id,
       userId: USER,
     });
@@ -262,7 +268,7 @@ describe('DeleteBoardUseCase', () => {
   it('does not delete another user board', async () => {
     const { board } = await createBoard(OTHER_USER);
     await expect(
-      new DeleteBoardUseCase(boards).handle({
+      new DeleteBoardUseCase(boards, assets, storage).handle({
         boardId: board.id,
         userId: USER,
       }),

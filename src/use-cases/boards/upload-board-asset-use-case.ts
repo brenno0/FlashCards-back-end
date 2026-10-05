@@ -87,7 +87,8 @@ export class UploadBoardAssetUseCase {
       fileName: sanitizeFileName(fileName),
       mimeType,
       size: body.length,
-      orphanedAt: null,
+      // Orphaned until a save references it, so abandoned uploads get cleaned up.
+      orphanedAt: new Date(),
     });
 
     return { asset };
