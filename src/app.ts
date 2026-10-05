@@ -75,6 +75,13 @@ app.setErrorHandler((error, _request, reply) => {
     });
   }
 
+  if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
+    return reply.status(error.statusCode).send({
+      error: error.code ?? 'ClientError',
+      message: error.message,
+    });
+  }
+
   if (env.NODE_ENV !== 'production') {
     console.error(error);
   } else {

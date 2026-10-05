@@ -63,6 +63,7 @@
         "@fastify/multipart": "9.0.3",
         "@fastify/swagger": "9.5.1",
         "@fastify/swagger-ui": "5.2.3",
+        "@googleapis/drive": "26.0.2",
         "@vitest/ui": "3.2.4",
         "bcrypt": "6.0.0",
         "bcryptjs": "3.0.2",

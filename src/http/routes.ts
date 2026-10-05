@@ -5,6 +5,10 @@ import { boardDocumentSchema } from '@/use-cases/boards/board-document';
 
 import { authenticate, createUser } from './controllers/auth.controller';
 import {
+  getBoardAsset,
+  uploadBoardAsset,
+} from './controllers/board-assets.controller';
+import {
   createBoard,
   deleteBoard,
   getBoardById,
@@ -616,5 +620,55 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     deleteBoard,
+  );
+  const boardAssetParamsSchema = z.object({
+    id: z.string().uuid(),
+    assetId: z.string().uuid(),
+  });
+
+  app.post(
+    '/boards/:id/assets',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'uploadBoardAsset',
+        consumes: ['multipart/form-data'],
+        params: boardParamsSchema,
+        querystring: z.object({ kind: z.enum(['image', 'file']) }),
+        response: {
+          201: z.object({
+            assetId: z.string(),
+            kind: z.enum(['IMAGE', 'FILE']),
+            fileName: z.string(),
+            mimeType: z.string(),
+            size: z.number(),
+          }),
+          400: boardErrorSchema,
+          404: boardErrorSchema,
+          413: boardErrorSchema,
+          415: boardErrorSchema,
+          503: boardErrorSchema,
+        },
+      },
+    },
+    uploadBoardAsset,
+  );
+
+  app.get(
+    '/boards/:id/assets/:assetId',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'getBoardAsset',
+        params: boardAssetParamsSchema,
+        response: {
+          404: boardErrorSchema,
+          503: boardErrorSchema,
+        },
+      },
+    },
+    getBoardAsset,
   );
 };
