@@ -30,6 +30,7 @@ import {
   getFlashCard,
   updateFlashcardsProgress,
 } from './controllers/flashcards.controller';
+import { getLinkPreview } from './controllers/link-preview.controller';
 import {
   finishStudySession,
   startStudySession,
@@ -670,5 +671,34 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     getBoardAsset,
+  );
+  app.post(
+    '/link-preview',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'getLinkPreview',
+        body: z.object({
+          url: z
+            .string()
+            .url()
+            .max(2048)
+            .refine(
+              (value) => /^https?:\/\//i.test(value),
+              'URL must use http or https',
+            ),
+        }),
+        response: {
+          200: z.object({
+            title: z.string().optional(),
+            description: z.string().optional(),
+            faviconUrl: z.string().optional(),
+          }),
+          429: boardErrorSchema,
+        },
+      },
+    },
+    getLinkPreview,
   );
 };
