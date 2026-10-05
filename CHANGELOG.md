@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.0.13...v3.1.0) (2026-10-05)
+
+
+### Features
+
+* **boards:** add board asset storage with Google Drive and local disk ([ad8ddb0](https://github.com/brenno0/FlashCards-back-end/commit/ad8ddb0b0f7a92a226f28c5fe645bc1d30c2bde6))
+* **boards:** add board persistence with versioned content save ([bad35fa](https://github.com/brenno0/FlashCards-back-end/commit/bad35fab00836d5aee3d719ed0b4d0ed60379a18))
+* **boards:** add SSRF-safe link preview endpoint ([c822a88](https://github.com/brenno0/FlashCards-back-end/commit/c822a88303747a8ffa8a332b28d683676ef0b422))
+* **boards:** clean up orphaned board assets ([09c6049](https://github.com/brenno0/FlashCards-back-end/commit/09c6049e5bed172a50a5f1458de93210817c9b6e))
+
 ### [3.0.13](https://github.com/brenno0/FlashCards-back-end/compare/v3.0.12...v3.0.13) (2026-09-23)
 
 ### [3.0.12](https://github.com/brenno0/FlashCards-back-end/compare/v3.0.11...v3.0.12) (2026-09-23)
