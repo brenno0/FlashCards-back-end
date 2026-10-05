@@ -20,6 +20,8 @@ model User {
   studySessions StudySession[]
   progress      FlashcardProgress[]
   Tag           Tag[]
+  boards        Board[]
+  boardAssets   BoardAsset[]
 }
 
 model Deck {
@@ -36,6 +38,7 @@ model Deck {
   flashcards    Flashcard[]
   studySessions StudySession[]
   tags          DeckTag[]
+  boards        Board[]
 }
 
 model Flashcard {
@@ -110,6 +113,48 @@ model DeckTag {
   tagId String
 
   @@id([deckId, tagId])
+}
+
+model Board {
+  id        String   @id @default(uuid())
+  title     String
+  content   Json
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  deck   Deck?   @relation(fields: [deckId], references: [id], onDelete: SetNull)
+  deckId String?
+
+  assets BoardAsset[]
+
+  @@index([userId])
+}
+
+model BoardAsset {
+  id         String    @id @default(uuid())
+  kind       AssetKind
+  storageKey String
+  fileName   String
+  mimeType   String
+  size       Int
+  orphanedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String
+
+  @@index([boardId])
+  @@index([orphanedAt])
+}
+
+enum AssetKind {
+  IMAGE
+  FILE
 }
 
 enum ProgressStatus {

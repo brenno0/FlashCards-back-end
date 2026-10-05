@@ -68,6 +68,13 @@ app.setErrorHandler((error, _request, reply) => {
       .send({ message: 'Validation Error', issues: error.format() });
   }
 
+  if (error.validation) {
+    return reply.status(400).send({
+      error: 'ValidationError',
+      message: error.message,
+    });
+  }
+
   if (env.NODE_ENV !== 'production') {
     console.error(error);
   } else {

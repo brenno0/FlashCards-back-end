@@ -1,8 +1,17 @@
 import { z } from 'zod';
 
 import type { FastifyTypedInstance } from '@/@types/fastifyTypes';
+import { boardDocumentSchema } from '@/use-cases/boards/board-document';
 
 import { authenticate, createUser } from './controllers/auth.controller';
+import {
+  createBoard,
+  deleteBoard,
+  getBoardById,
+  getBoards,
+  saveBoardContent,
+  updateBoardMeta,
+} from './controllers/boards.controller';
 import {
   createDeck,
   deleteDeckById,
@@ -476,5 +485,136 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     finishStudySession,
+  );
+  const boardErrorSchema = z.object({
+    error: z.string(),
+    message: z.string(),
+  });
+  const boardSummarySchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    deckId: z.string().nullable(),
+    version: z.number(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+  });
+  const boardSchema = boardSummarySchema.extend({
+    content: boardDocumentSchema,
+  });
+  const boardParamsSchema = z.object({ id: z.string().uuid() });
+
+  app.get(
+    '/boards',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'getBoards',
+        response: {
+          200: z.array(boardSummarySchema),
+        },
+      },
+    },
+    getBoards,
+  );
+
+  app.post(
+    '/boards',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'createBoard',
+        body: z.object({
+          title: z.string().min(1).max(200),
+          deckId: z.string().uuid().nullish(),
+        }),
+        response: {
+          201: boardSchema,
+          404: boardErrorSchema,
+        },
+      },
+    },
+    createBoard,
+  );
+
+  app.get(
+    '/boards/:id',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'getBoardById',
+        params: boardParamsSchema,
+        response: {
+          200: boardSchema,
+          404: boardErrorSchema,
+        },
+      },
+    },
+    getBoardById,
+  );
+
+  app.patch(
+    '/boards/:id',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'updateBoardMeta',
+        params: boardParamsSchema,
+        body: z.object({
+          title: z.string().min(1).max(200).optional(),
+          deckId: z.string().uuid().nullish(),
+        }),
+        response: {
+          200: boardSchema,
+          404: boardErrorSchema,
+        },
+      },
+    },
+    updateBoardMeta,
+  );
+
+  app.put(
+    '/boards/:id/content',
+    {
+      onRequest: [verifyJWT],
+      bodyLimit: 3 * 1024 * 1024,
+      schema: {
+        tags: ['Boards'],
+        operationId: 'saveBoardContent',
+        params: boardParamsSchema,
+        body: z.object({
+          content: boardDocumentSchema,
+          version: z.number().int().positive(),
+        }),
+        response: {
+          200: z.object({ version: z.number() }),
+          400: boardErrorSchema,
+          404: boardErrorSchema,
+          409: boardErrorSchema.extend({ currentVersion: z.number() }),
+          413: boardErrorSchema,
+        },
+      },
+    },
+    saveBoardContent,
+  );
+
+  app.delete(
+    '/boards/:id',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Boards'],
+        operationId: 'deleteBoard',
+        params: boardParamsSchema,
+        response: {
+          204: z.null(),
+          404: boardErrorSchema,
+        },
+      },
+    },
+    deleteBoard,
   );
 };
