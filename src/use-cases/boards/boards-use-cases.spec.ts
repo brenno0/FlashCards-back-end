@@ -6,6 +6,7 @@ import { InMemoryStorageProvider } from '@/lib/storage/in-memory-storage-provide
 import { InMemoryBoardAssetsRepository } from '@/repositories/in-memory/in-memory-board-assets-repository';
 import { InMemoryBoardsRepository } from '@/repositories/in-memory/in-memory-boards-repository';
 import { InMemoryDecksRepository } from '@/repositories/in-memory/in-memory-decks-repository';
+import { InMemoryFoldersRepository } from '@/repositories/in-memory/in-memory-folders-repository';
 
 import { BoardContentTooLargeError } from '../errors/boardContentTooLarge';
 import { BoardVersionConflictError } from '../errors/boardVersionConflict';
@@ -25,6 +26,7 @@ const OTHER_USER = 'user-2';
 
 let boards: InMemoryBoardsRepository;
 let decks: InMemoryDecksRepository;
+let folders: InMemoryFoldersRepository;
 let assets: InMemoryBoardAssetsRepository;
 let storage: InMemoryStorageProvider;
 
@@ -51,12 +53,13 @@ const sectionDoc = {
 beforeEach(() => {
   boards = new InMemoryBoardsRepository();
   decks = new InMemoryDecksRepository();
+  folders = new InMemoryFoldersRepository();
   assets = new InMemoryBoardAssetsRepository();
   storage = new InMemoryStorageProvider();
 });
 
 const createBoard = (userId = USER, deckId?: string) =>
-  new CreateBoardUseCase(boards, decks).handle({
+  new CreateBoardUseCase(boards, decks, folders).handle({
     title: 'Bio',
     userId,
     deckId,
@@ -188,7 +191,9 @@ describe('SaveBoardContentUseCase', () => {
     );
 
     boards.assets.set(board.id, [assetId]);
-    await expect(save(board.id, withImage, 1)).resolves.toEqual({ version: 2 });
+    await expect(save(board.id, withImage, 1)).resolves.toEqual({
+      version: 2,
+    });
   });
 
   it('rejects content over 2 MB', async () => {
@@ -225,6 +230,7 @@ describe('UpdateBoardMetaUseCase', () => {
     const { board: updated } = await new UpdateBoardMetaUseCase(
       boards,
       decks,
+      folders,
     ).handle({
       boardId: board.id,
       userId: USER,
@@ -241,7 +247,7 @@ describe('UpdateBoardMetaUseCase', () => {
     const foreign = await decks.create({ title: 'D', userId: OTHER_USER });
     const { board } = await createBoard();
     await expect(
-      new UpdateBoardMetaUseCase(boards, decks).handle({
+      new UpdateBoardMetaUseCase(boards, decks, folders).handle({
         boardId: board.id,
         userId: USER,
         deckId: foreign.id,

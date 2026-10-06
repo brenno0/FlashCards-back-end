@@ -22,6 +22,7 @@ model User {
   Tag           Tag[]
   boards        Board[]
   boardAssets   BoardAsset[]
+  folders       Folder[]
 }
 
 model Deck {
@@ -35,10 +36,15 @@ model Deck {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId String?
+
   flashcards    Flashcard[]
   studySessions StudySession[]
   tags          DeckTag[]
   boards        Board[]
+
+  @@index([folderId])
 }
 
 model Flashcard {
@@ -127,10 +133,39 @@ model Board {
   userId String
   deck   Deck?   @relation(fields: [deckId], references: [id], onDelete: SetNull)
   deckId String?
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId String?
 
   assets BoardAsset[]
 
   @@index([userId])
+  @@index([folderId])
+}
+
+/// Folders organize either decks or boards (never both), and can nest.
+model Folder {
+  id        String     @id @default(uuid())
+  name      String
+  kind      FolderKind
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  parent   Folder?  @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?
+  children Folder[] @relation("FolderTree")
+
+  decks  Deck[]
+  boards Board[]
+
+  @@index([userId, kind])
+  @@index([parentId])
+}
+
+enum FolderKind {
+  DECK
+  BOARD
 }
 
 model BoardAsset {

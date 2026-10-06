@@ -2,7 +2,7 @@ import type { Board, Prisma } from 'generated/prisma';
 
 export type BoardSummary = Pick<
   Board,
-  'id' | 'title' | 'deckId' | 'version' | 'createdAt' | 'updatedAt'
+  'id' | 'title' | 'deckId' | 'folderId' | 'version' | 'createdAt' | 'updatedAt'
 >;
 
 export interface BoardsRepository {
@@ -10,6 +10,7 @@ export interface BoardsRepository {
     title: string;
     userId: string;
     deckId?: string | null;
+    folderId?: string | null;
     content: Prisma.InputJsonValue;
   }): Promise<Board>;
   listByUser({ userId }: { userId: string }): Promise<BoardSummary[]>;
@@ -25,7 +26,11 @@ export interface BoardsRepository {
     data,
   }: {
     boardId: string;
-    data: { title?: string; deckId?: string | null };
+    data: {
+      title?: string;
+      deckId?: string | null;
+      folderId?: string | null;
+    };
   }): Promise<Board>;
   /** Writes content only when stored version equals expectedVersion. Returns new version, or null when no row matched. */
   saveContent({

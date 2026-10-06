@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import z from 'zod';
 
+import { InvalidFolderMoveError } from '@/use-cases/errors/invalidFolderMove';
 import { ResourceAlreadyExists } from '@/use-cases/errors/resourceAlreadyExists';
 import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { makeCreateDeck } from '@/use-cases/factories/make-create-deck';
@@ -18,8 +19,9 @@ export const createDeck = async (
       title: z.string(),
       description: z.string().optional(),
       isPublic: z.boolean().optional(),
+      folderId: z.string().uuid().nullish(),
     });
-    const { title, description, isPublic } = registerBodySchema.parse(
+    const { title, description, isPublic, folderId } = registerBodySchema.parse(
       request.body,
     );
 
@@ -31,17 +33,31 @@ export const createDeck = async (
       title,
       description,
       isPublic,
+      folderId,
       userId,
     });
 
     return reply.status(201).send(deck);
   } catch (error) {
     if (error instanceof ResourceAlreadyExists) {
-      reply.status(400).send({
+      return reply.status(400).send({
         message: error.message,
         error: 'ResourceAlreadyExistsError',
       });
     }
+    if (error instanceof ResourceNotFoundError) {
+      return reply.status(404).send({
+        message: error.message,
+        error: 'ResourceNotFoundError',
+      });
+    }
+    if (error instanceof InvalidFolderMoveError) {
+      return reply.status(400).send({
+        message: error.message,
+        error: 'InvalidFolderMoveError',
+      });
+    }
+    throw error;
   }
 };
 
@@ -56,11 +72,13 @@ export const getAllDecks = async (
       title: z.string().optional(),
       description: z.string().optional(),
       isPublic: z.boolean().optional(),
-      page: z.number().optional(),
-      pageSize: z.number().optional(),
+      /** A folder id, or `root` for decks outside any folder. Omit to list every deck. */
+      folderId: z.union([z.literal('root'), z.string().uuid()]).optional(),
+      page: z.coerce.number().optional(),
+      pageSize: z.coerce.number().optional(),
     });
 
-    const { title, description, isPublic, page, pageSize } =
+    const { title, description, isPublic, folderId, page, pageSize } =
       registerBodySchema.parse(request.query);
 
     const { sub: userId } = request.user;
@@ -70,6 +88,7 @@ export const getAllDecks = async (
       title,
       description,
       isPublic,
+      folderId: folderId === 'root' ? null : folderId,
       page,
       pageSize,
     });
@@ -127,10 +146,11 @@ export const updateDeckById = async (
       description: z.string().optional(),
       title: z.string().optional(),
       isPublic: z.boolean().optional(),
+      folderId: z.string().uuid().nullish(),
     });
 
     const { id } = decksParamsSchema.parse(request.params);
-    const { description, isPublic, title } = decksBodySchema.parse(
+    const { description, isPublic, title, folderId } = decksBodySchema.parse(
       request.body,
     );
     const { sub } = request.user;
@@ -142,6 +162,7 @@ export const updateDeckById = async (
         isPublic,
         title,
       },
+      folderId,
       userId: sub,
     });
     return reply.status(200).send(updatedDeck);

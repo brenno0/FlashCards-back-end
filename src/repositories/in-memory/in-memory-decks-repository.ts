@@ -20,6 +20,7 @@ export class InMemoryDecksRepository implements DecksRepository {
       title: data.title,
       description: data.description ?? null,
       isPublic: data.isPublic ?? false,
+      folderId: data.folderId ?? null,
       userId: data.userId,
       createdAt: now,
       updatedAt: now,
@@ -38,6 +39,7 @@ export class InMemoryDecksRepository implements DecksRepository {
 
   async getAll({
     userId,
+    filters,
     page = 1,
     pageSize = 20,
   }: {
@@ -46,10 +48,13 @@ export class InMemoryDecksRepository implements DecksRepository {
     page?: number;
     pageSize?: number;
   }): Promise<GetAllResponse> {
-    const data = this.items
-      .filter((item) => item.userId === userId)
-      .slice((page - 1) * pageSize, page * pageSize);
-    return { data, count: data.length, page, pageSize };
+    const matching = this.items.filter(
+      (item) =>
+        item.userId === userId &&
+        (filters.folderId === undefined || item.folderId === filters.folderId),
+    );
+    const data = matching.slice((page - 1) * pageSize, page * pageSize);
+    return { data, count: matching.length, page, pageSize };
   }
 
   async getById({

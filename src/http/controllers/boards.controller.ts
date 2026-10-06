@@ -4,6 +4,7 @@ import z from 'zod';
 import { BoardContentTooLargeError } from '@/use-cases/errors/boardContentTooLarge';
 import { BoardVersionConflictError } from '@/use-cases/errors/boardVersionConflict';
 import { InvalidBoardDocumentError } from '@/use-cases/errors/invalidBoardDocument';
+import { InvalidFolderMoveError } from '@/use-cases/errors/invalidFolderMove';
 import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { makeCreateBoard } from '@/use-cases/factories/make-create-board';
 import { makeDeleteBoard } from '@/use-cases/factories/make-delete-board';
@@ -29,14 +30,21 @@ const handleBoardError = (error: unknown, reply: FastifyReply) => {
     });
   }
   if (error instanceof InvalidBoardDocumentError) {
+    return reply.status(400).send({
+      message: error.message,
+      error: 'InvalidBoardDocumentError',
+    });
+  }
+  if (error instanceof InvalidFolderMoveError) {
     return reply
       .status(400)
-      .send({ message: error.message, error: 'InvalidBoardDocumentError' });
+      .send({ message: error.message, error: 'InvalidFolderMoveError' });
   }
   if (error instanceof BoardContentTooLargeError) {
-    return reply
-      .status(413)
-      .send({ message: error.message, error: 'BoardContentTooLargeError' });
+    return reply.status(413).send({
+      message: error.message,
+      error: 'BoardContentTooLargeError',
+    });
   }
   throw error;
 };
@@ -46,10 +54,11 @@ export const createBoard = async (
   reply: FastifyReply,
 ) => {
   try {
-    const { title, deckId } = z
+    const { title, deckId, folderId } = z
       .object({
         title: z.string().min(1).max(200),
         deckId: z.string().uuid().nullish(),
+        folderId: z.string().uuid().nullish(),
       })
       .parse(request.body);
     const { sub: userId } = request.user;
@@ -58,6 +67,7 @@ export const createBoard = async (
     const { board } = await createBoardUseCase.handle({
       title,
       deckId,
+      folderId,
       userId,
     });
 
@@ -86,7 +96,10 @@ export const getBoardById = async (
     const { sub: userId } = request.user;
 
     const { getBoardByIdUseCase } = makeGetBoardById();
-    const { board } = await getBoardByIdUseCase.handle({ boardId: id, userId });
+    const { board } = await getBoardByIdUseCase.handle({
+      boardId: id,
+      userId,
+    });
 
     return reply.status(200).send(board);
   } catch (error) {
@@ -100,10 +113,11 @@ export const updateBoardMeta = async (
 ) => {
   try {
     const { id } = boardParamsSchema.parse(request.params);
-    const { title, deckId } = z
+    const { title, deckId, folderId } = z
       .object({
         title: z.string().min(1).max(200).optional(),
         deckId: z.string().uuid().nullish(),
+        folderId: z.string().uuid().nullish(),
       })
       .parse(request.body);
     const { sub: userId } = request.user;
@@ -114,6 +128,7 @@ export const updateBoardMeta = async (
       userId,
       title,
       deckId,
+      folderId,
     });
 
     return reply.status(200).send(board);
@@ -129,7 +144,10 @@ export const saveBoardContent = async (
   try {
     const { id } = boardParamsSchema.parse(request.params);
     const { content, version } = z
-      .object({ content: z.unknown(), version: z.number().int().positive() })
+      .object({
+        content: z.unknown(),
+        version: z.number().int().positive(),
+      })
       .parse(request.body);
     const { sub: userId } = request.user;
 

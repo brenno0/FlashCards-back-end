@@ -8,6 +8,7 @@ export class BoardsPrismaRepository implements BoardsRepository {
     title: string;
     userId: string;
     deckId?: string | null;
+    folderId?: string | null;
     content: Prisma.InputJsonValue;
   }): Promise<Board> {
     return prisma.board.create({ data });
@@ -20,6 +21,7 @@ export class BoardsPrismaRepository implements BoardsRepository {
         id: true,
         title: true,
         deckId: true,
+        folderId: true,
         version: true,
         createdAt: true,
         updatedAt: true,
@@ -43,7 +45,11 @@ export class BoardsPrismaRepository implements BoardsRepository {
     data,
   }: {
     boardId: string;
-    data: { title?: string; deckId?: string | null };
+    data: {
+      title?: string;
+      deckId?: string | null;
+      folderId?: string | null;
+    };
   }): Promise<Board> {
     return prisma.board.update({ where: { id: boardId }, data });
   }

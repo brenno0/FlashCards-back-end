@@ -111,6 +111,26 @@ export const boardNodeSchema = z.discriminatedUnion('type', [
     }),
   }),
   nodeBase.extend({
+    type: z.literal('shape'),
+    data: z.object({
+      shape: z.enum([
+        'rectangle',
+        'rounded',
+        'ellipse',
+        'diamond',
+        'triangle',
+        'hexagon',
+        'parallelogram',
+        'cylinder',
+      ]),
+      text: z.string().max(20000),
+      doc: richDoc.optional(),
+      color,
+      fill: z.enum(['solid', 'soft', 'none']).optional(),
+      stroke: z.enum(['solid', 'dashed', 'dotted']).optional(),
+    }),
+  }),
+  nodeBase.extend({
     type: z.literal('section'),
     data: z.object({ title: z.string().max(500), color }),
   }),

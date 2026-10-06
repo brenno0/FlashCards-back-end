@@ -67,11 +67,42 @@ describe('boardDocumentSchema', () => {
               size: 3,
             },
           },
+          {
+            id: 'sh1',
+            type: 'shape',
+            position: { x: 1, y: 1 },
+            width: 160,
+            height: 100,
+            parentId: 's1',
+            data: {
+              shape: 'diamond',
+              text: 'Decide',
+              color: 'blue',
+              fill: 'soft',
+              stroke: 'dashed',
+            },
+          },
         ],
         edges: [{ id: 'e1', source: 'i1', target: 's1', label: 'x' }],
       }),
     );
     expect(result.success).toBe(true);
+  });
+
+  it('rejects unknown shapes', () => {
+    const result = boardDocumentSchema.safeParse(
+      doc({
+        nodes: [
+          {
+            id: 'sh1',
+            type: 'shape',
+            position: { x: 0, y: 0 },
+            data: { shape: 'blob', text: '' },
+          } as never,
+        ],
+      }),
+    );
+    expect(result.success).toBe(false);
   });
 
   it('rejects unknown node type', () => {
@@ -95,7 +126,11 @@ describe('rich text fields', () => {
               {
                 type: 'paragraph',
                 content: [
-                  { type: 'text', text: 'hi', marks: [{ type: 'bold' }] },
+                  {
+                    type: 'text',
+                    text: 'hi',
+                    marks: [{ type: 'bold' }],
+                  },
                 ],
               },
             ],
@@ -128,7 +163,12 @@ describe('rich text fields', () => {
           id: 't',
           type: 'text',
           position: { x: 0, y: 0 },
-          data: { text: 'hi', doc: rich, fontSize: 'l', align: 'center' },
+          data: {
+            text: 'hi',
+            doc: rich,
+            fontSize: 'l',
+            align: 'center',
+          },
         },
         {
           id: 'i',
@@ -322,7 +362,12 @@ describe('collectAssetIds', () => {
             id: 'b',
             type: 'file',
             position: { x: 0, y: 0 },
-            data: { assetId: ASSET_ID, fileName: 'x', mimeType: 'x', size: 1 },
+            data: {
+              assetId: ASSET_ID,
+              fileName: 'x',
+              mimeType: 'x',
+              size: 1,
+            },
           },
           icon('c'),
         ],

@@ -62,20 +62,28 @@ export class DecksPrismaRepository implements DecksRepository {
       where.isPublic = filters.isPublic;
     }
 
-    const decks = await prisma.deck.findMany({
-      where,
-      include: {
-        _count: true,
-        studySessions: true,
-        tags: true,
-      },
-      take: pageSize,
-      skip: (page - 1) * pageSize,
-    });
+    if (filters.folderId !== undefined) {
+      where.folderId = filters.folderId;
+    }
+
+    const [decks, count] = await prisma.$transaction([
+      prisma.deck.findMany({
+        where,
+        include: {
+          _count: true,
+          studySessions: true,
+          tags: true,
+        },
+        orderBy: { createdAt: 'asc' },
+        take: pageSize,
+        skip: (page - 1) * pageSize,
+      }),
+      prisma.deck.count({ where }),
+    ]);
 
     return {
       data: decks,
-      count: decks.length,
+      count,
       page,
       pageSize,
     };
@@ -102,6 +110,7 @@ export class DecksPrismaRepository implements DecksRepository {
         id: true,
         isPublic: true,
         title: true,
+        folderId: true,
         updatedAt: true,
       },
     });

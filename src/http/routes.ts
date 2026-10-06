@@ -30,6 +30,12 @@ import {
   getFlashCard,
   updateFlashcardsProgress,
 } from './controllers/flashcards.controller';
+import {
+  createFolder,
+  deleteFolder,
+  getFolders,
+  updateFolder,
+} from './controllers/folders.controller';
 import { getLinkPreview } from './controllers/link-preview.controller';
 import {
   finishStudySession,
@@ -131,13 +137,15 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
           title: z.string(),
           description: z.string().optional(),
           isPublic: z.boolean().optional(),
+          folderId: z.string().uuid().nullish(),
         }),
         response: {
-          200: z.object({
+          201: z.object({
             id: z.string(),
             title: z.string(),
-            description: z.string(),
+            description: z.string().nullable(),
             isPublic: z.boolean(),
+            folderId: z.string().nullable(),
             createdAt: z.date(),
             updatedAt: z.date(),
           }),
@@ -162,8 +170,9 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
           title: z.string().optional().nullable(),
           description: z.string().optional().nullable(),
           isPublic: z.boolean().optional().nullable(),
-          page: z.number().optional(),
-          pageSize: z.number().optional(),
+          folderId: z.union([z.literal('root'), z.string().uuid()]).optional(),
+          page: z.coerce.number().optional(),
+          pageSize: z.coerce.number().optional(),
         }),
         response: {
           200: z.object({
@@ -173,6 +182,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
                 title: z.string(),
                 description: z.string().nullable(),
                 isPublic: z.boolean(),
+                folderId: z.string().nullable(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
               }),
@@ -208,6 +218,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
             title: z.string(),
             description: z.string().nullable(),
             isPublic: z.boolean(),
+            folderId: z.string().nullable(),
             createdAt: z.date(),
             updatedAt: z.date(),
           }),
@@ -235,6 +246,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
           title: z.string().optional(),
           description: z.string().optional(),
           isPublic: z.boolean().optional(),
+          folderId: z.string().uuid().nullish(),
         }),
 
         response: {
@@ -243,6 +255,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
             title: z.string(),
             description: z.string().nullable(),
             isPublic: z.boolean(),
+            folderId: z.string().nullable(),
             createdAt: z.date(),
             updatedAt: z.date(),
           }),
@@ -499,6 +512,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     id: z.string(),
     title: z.string(),
     deckId: z.string().nullable(),
+    folderId: z.string().nullable(),
     version: z.number(),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -533,6 +547,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
         body: z.object({
           title: z.string().min(1).max(200),
           deckId: z.string().uuid().nullish(),
+          folderId: z.string().uuid().nullish(),
         }),
         response: {
           201: boardSchema,
@@ -571,6 +586,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
         body: z.object({
           title: z.string().min(1).max(200).optional(),
           deckId: z.string().uuid().nullish(),
+          folderId: z.string().uuid().nullish(),
         }),
         response: {
           200: boardSchema,
@@ -598,7 +614,9 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
           200: z.object({ version: z.number() }),
           400: boardErrorSchema,
           404: boardErrorSchema,
-          409: boardErrorSchema.extend({ currentVersion: z.number() }),
+          409: boardErrorSchema.extend({
+            currentVersion: z.number(),
+          }),
           413: boardErrorSchema,
         },
       },
@@ -672,6 +690,99 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     },
     getBoardAsset,
   );
+  const folderSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    kind: z.enum(['DECK', 'BOARD']),
+    parentId: z.string().nullable(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+  });
+  const folderErrorSchema = z.object({
+    error: z.string(),
+    message: z.string(),
+  });
+  const folderParamsSchema = z.object({ id: z.string().uuid() });
+
+  app.get(
+    '/folders',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Folders'],
+        operationId: 'getFolders',
+        querystring: z.object({
+          kind: z.enum(['DECK', 'BOARD']).optional(),
+        }),
+        response: {
+          200: z.array(folderSchema),
+        },
+      },
+    },
+    getFolders,
+  );
+
+  app.post(
+    '/folders',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Folders'],
+        operationId: 'createFolder',
+        body: z.object({
+          name: z.string().trim().min(1).max(120),
+          kind: z.enum(['DECK', 'BOARD']),
+          parentId: z.string().uuid().nullish(),
+        }),
+        response: {
+          201: folderSchema,
+          400: folderErrorSchema,
+          404: folderErrorSchema,
+        },
+      },
+    },
+    createFolder,
+  );
+
+  app.patch(
+    '/folders/:id',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Folders'],
+        operationId: 'updateFolder',
+        params: folderParamsSchema,
+        body: z.object({
+          name: z.string().trim().min(1).max(120).optional(),
+          parentId: z.string().uuid().nullish(),
+        }),
+        response: {
+          200: folderSchema,
+          400: folderErrorSchema,
+          404: folderErrorSchema,
+        },
+      },
+    },
+    updateFolder,
+  );
+
+  app.delete(
+    '/folders/:id',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Folders'],
+        operationId: 'deleteFolder',
+        params: folderParamsSchema,
+        response: {
+          204: z.null(),
+          404: folderErrorSchema,
+        },
+      },
+    },
+    deleteFolder,
+  );
+
   app.post(
     '/link-preview',
     {

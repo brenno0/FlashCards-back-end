@@ -4,6 +4,8 @@ export interface GetAllFilters {
   description?: string | null;
   isPublic?: boolean;
   title?: string;
+  /** `null` lists decks outside any folder; `undefined` lists every deck. */
+  folderId?: string | null;
 }
 
 export interface GetAllResponse {

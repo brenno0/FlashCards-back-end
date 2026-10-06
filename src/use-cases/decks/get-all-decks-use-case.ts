@@ -7,6 +7,7 @@ interface GetAllDecksRequest {
   title?: string;
   description?: string | null;
   isPublic?: boolean;
+  folderId?: string | null;
   page?: number;
   pageSize?: number;
 }
@@ -19,6 +20,7 @@ export class GetAllDecksUseCase {
     description,
     isPublic,
     title,
+    folderId,
     page,
     pageSize,
   }: GetAllDecksRequest) {
@@ -31,6 +33,7 @@ export class GetAllDecksUseCase {
         description,
         isPublic,
         title,
+        folderId,
       },
       page,
       pageSize,

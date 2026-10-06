@@ -13,6 +13,7 @@ export class InMemoryBoardsRepository implements BoardsRepository {
     title: string;
     userId: string;
     deckId?: string | null;
+    folderId?: string | null;
     content: Prisma.InputJsonValue;
   }): Promise<Board> {
     const now = new Date();
@@ -21,6 +22,7 @@ export class InMemoryBoardsRepository implements BoardsRepository {
       title: data.title,
       userId: data.userId,
       deckId: data.deckId ?? null,
+      folderId: data.folderId ?? null,
       content: data.content as Prisma.JsonValue,
       version: 1,
       createdAt: now,
@@ -34,14 +36,17 @@ export class InMemoryBoardsRepository implements BoardsRepository {
     return this.items
       .filter((item) => item.userId === userId)
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-      .map(({ id, title, deckId, version, createdAt, updatedAt }) => ({
-        id,
-        title,
-        deckId,
-        version,
-        createdAt,
-        updatedAt,
-      }));
+      .map(
+        ({ id, title, deckId, folderId, version, createdAt, updatedAt }) => ({
+          id,
+          title,
+          deckId,
+          folderId,
+          version,
+          createdAt,
+          updatedAt,
+        }),
+      );
   }
 
   async findById({
@@ -63,7 +68,11 @@ export class InMemoryBoardsRepository implements BoardsRepository {
     data,
   }: {
     boardId: string;
-    data: { title?: string; deckId?: string | null };
+    data: {
+      title?: string;
+      deckId?: string | null;
+      folderId?: string | null;
+    };
   }): Promise<Board> {
     const board = this.items.find((item) => item.id === boardId);
     if (!board) {
@@ -74,6 +83,9 @@ export class InMemoryBoardsRepository implements BoardsRepository {
     }
     if (data.deckId !== undefined) {
       board.deckId = data.deckId;
+    }
+    if (data.folderId !== undefined) {
+      board.folderId = data.folderId;
     }
     board.updatedAt = new Date();
     return board;
