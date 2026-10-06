@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.1.0...v3.2.0) (2026-10-06)
+
+
+### Features
+
+* **boards:** accept rich text fields in board documents ([6f4b9c4](https://github.com/brenno0/FlashCards-back-end/commit/6f4b9c414dd104fd57b70f9525ec5a8b87f813ef))
+
 ## [3.1.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.0.13...v3.1.0) (2026-10-05)
 
 
