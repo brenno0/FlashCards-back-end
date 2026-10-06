@@ -11,6 +11,42 @@ const httpUrl = z
   .url()
   .refine((value) => /^https?:\/\//i.test(value), 'URL must use http or https');
 
+type RichAttrs = Record<string, string | number | boolean | null>;
+
+type RichNode = {
+  type: string;
+  attrs?: RichAttrs;
+  content?: RichNode[];
+  marks?: { type: string; attrs?: RichAttrs }[];
+  text?: string;
+};
+
+/** Tiptap attrs are flat primitives (heading level, link href, text align). */
+const richAttrs = z
+  .record(
+    z.string(),
+    z.union([z.string().max(2048), z.number(), z.boolean(), z.null()]),
+  )
+  .optional();
+
+/** Tiptap/ProseMirror JSON. Rendered only through the editor schema, never as HTML. */
+const richDoc: z.ZodType<RichNode> = z.lazy(() =>
+  z.object({
+    type: z.string().max(64),
+    attrs: richAttrs,
+    content: z.array(richDoc).optional(),
+    marks: z
+      .array(
+        z.object({
+          type: z.string().max(64),
+          attrs: richAttrs,
+        }),
+      )
+      .optional(),
+    text: z.string().max(20000).optional(),
+  }),
+);
+
 const nodeBase = z.object({
   id,
   position: z.object({ x: z.number(), y: z.number() }),
@@ -26,12 +62,18 @@ export const boardNodeSchema = z.discriminatedUnion('type', [
     data: z.object({
       icon: z.string().max(64),
       label: z.string().max(2000),
+      labelDoc: richDoc.optional(),
       color,
     }),
   }),
   nodeBase.extend({
     type: z.literal('text'),
-    data: z.object({ text: z.string().max(20000) }),
+    data: z.object({
+      text: z.string().max(20000),
+      doc: richDoc.optional(),
+      fontSize: z.enum(['s', 'm', 'l', 'xl']).optional(),
+      align: z.enum(['left', 'center', 'right']).optional(),
+    }),
   }),
   nodeBase.extend({
     type: z.literal('image'),
@@ -40,6 +82,8 @@ export const boardNodeSchema = z.discriminatedUnion('type', [
       width: z.number().positive(),
       height: z.number().positive(),
       alt: z.string().max(500).optional(),
+      caption: z.string().max(2000).optional(),
+      captionDoc: richDoc.optional(),
     }),
   }),
   nodeBase.extend({
@@ -84,6 +128,7 @@ export const boardEdgeSchema = z.object({
       arrowStart: z.boolean().optional(),
       arrowEnd: z.boolean().optional(),
       style: z.enum(['solid', 'dashed']).optional(),
+      labelDoc: richDoc.optional(),
     })
     .optional(),
 });

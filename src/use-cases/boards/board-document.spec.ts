@@ -82,6 +82,128 @@ describe('boardDocumentSchema', () => {
   });
 });
 
+describe('rich text fields', () => {
+  const rich = {
+    type: 'doc',
+    content: [
+      {
+        type: 'bulletList',
+        content: [
+          {
+            type: 'listItem',
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  { type: 'text', text: 'hi', marks: [{ type: 'bold' }] },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const parse = (nodes: unknown[], edges: unknown[] = []) =>
+    boardDocumentSchema.safeParse(doc({ nodes, edges } as never));
+
+  it('keeps legacy plain text nodes valid', () => {
+    expect(
+      parse([
+        {
+          id: 't',
+          type: 'text',
+          position: { x: 0, y: 0 },
+          data: { text: 'a' },
+        },
+      ]).success,
+    ).toBe(true);
+  });
+
+  it('preserves rich docs, font size, align and captions', () => {
+    const result = parse(
+      [
+        {
+          id: 't',
+          type: 'text',
+          position: { x: 0, y: 0 },
+          data: { text: 'hi', doc: rich, fontSize: 'l', align: 'center' },
+        },
+        {
+          id: 'i',
+          type: 'icon',
+          position: { x: 0, y: 0 },
+          data: { icon: 'book', label: 'hi', labelDoc: rich },
+        },
+        {
+          id: 'img',
+          type: 'image',
+          position: { x: 0, y: 0 },
+          data: {
+            assetId: ASSET_ID,
+            width: 10,
+            height: 10,
+            caption: 'hi',
+            captionDoc: rich,
+          },
+        },
+      ],
+      [
+        {
+          id: 'e',
+          source: 't',
+          target: 'i',
+          label: 'hi',
+          data: { labelDoc: rich },
+        },
+      ],
+    );
+    expect(result.success).toBe(true);
+    if (!result.success) {
+      return;
+    }
+    const [text, iconNode, image] = result.data.nodes;
+    expect(text.data).toEqual({
+      text: 'hi',
+      doc: rich,
+      fontSize: 'l',
+      align: 'center',
+    });
+    expect(iconNode.data).toMatchObject({ labelDoc: rich });
+    expect(image.data).toMatchObject({ caption: 'hi', captionDoc: rich });
+    expect(result.data.edges[0].data).toEqual({ labelDoc: rich });
+  });
+
+  it('rejects unknown font size and oversized caption', () => {
+    expect(
+      parse([
+        {
+          id: 't',
+          type: 'text',
+          position: { x: 0, y: 0 },
+          data: { text: 'a', fontSize: 'huge' },
+        },
+      ]).success,
+    ).toBe(false);
+    expect(
+      parse([
+        {
+          id: 'img',
+          type: 'image',
+          position: { x: 0, y: 0 },
+          data: {
+            assetId: ASSET_ID,
+            width: 1,
+            height: 1,
+            caption: 'x'.repeat(2001),
+          },
+        },
+      ]).success,
+    ).toBe(false);
+  });
+});
+
 describe('link node URLs', () => {
   const link = (url: string, faviconUrl?: string) =>
     boardDocumentSchema.safeParse(
