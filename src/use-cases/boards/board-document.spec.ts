@@ -89,6 +89,49 @@ describe('boardDocumentSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('keeps label positions on icons and images', () => {
+    const result = boardDocumentSchema.safeParse(
+      doc({
+        nodes: [
+          {
+            ...icon('i1'),
+            data: { ...icon('i1').data, labelPosition: 'right' },
+          },
+          {
+            id: 'img',
+            type: 'image',
+            position: { x: 0, y: 0 },
+            data: {
+              assetId: ASSET_ID,
+              width: 10,
+              height: 10,
+              labelPosition: 'top',
+            },
+          },
+        ],
+      }),
+    );
+    expect(result.success).toBe(true);
+    expect(result.data?.nodes.map((node) => node.data)).toMatchObject([
+      { labelPosition: 'right' },
+      { labelPosition: 'top' },
+    ]);
+  });
+
+  it('rejects an unknown label position', () => {
+    const result = boardDocumentSchema.safeParse(
+      doc({
+        nodes: [
+          {
+            ...icon('i1'),
+            data: { ...icon('i1').data, labelPosition: 'middle' },
+          } as never,
+        ],
+      }),
+    );
+    expect(result.success).toBe(false);
+  });
+
   it('rejects unknown shapes', () => {
     const result = boardDocumentSchema.safeParse(
       doc({

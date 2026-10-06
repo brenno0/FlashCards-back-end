@@ -3,6 +3,8 @@ import { z } from 'zod';
 export const BOARD_CONTENT_MAX_BYTES = 2 * 1024 * 1024;
 
 const id = z.string().min(1).max(64);
+/** Side of the node body its label or caption sits on (default bottom). */
+const labelPosition = z.enum(['top', 'right', 'bottom', 'left']).optional();
 const color = z.string().max(32).optional();
 /** Rendered as href/src in the browser: only http(s), never javascript:/data: URLs. */
 const httpUrl = z
@@ -63,6 +65,7 @@ export const boardNodeSchema = z.discriminatedUnion('type', [
       icon: z.string().max(64),
       label: z.string().max(2000),
       labelDoc: richDoc.optional(),
+      labelPosition,
       color,
     }),
   }),
@@ -84,6 +87,7 @@ export const boardNodeSchema = z.discriminatedUnion('type', [
       alt: z.string().max(500).optional(),
       caption: z.string().max(2000).optional(),
       captionDoc: richDoc.optional(),
+      labelPosition,
     }),
   }),
   nodeBase.extend({
