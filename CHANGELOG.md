@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.2.0...v3.3.0) (2026-10-06)
+
+
+### Features
+
+* add folders for decks and boards, and shape nodes on boards ([0c7a5ed](https://github.com/brenno0/FlashCards-back-end/commit/0c7a5edbbec37314068ca1b89ddb5d525062df40))
+
 ## [3.2.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.1.0...v3.2.0) (2026-10-06)
 
 
