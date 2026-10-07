@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.4.0...v3.5.0) (2026-10-07)
+
+
+### Features
+
+* personal access tokens and bulk flashcard creation ([da75e5c](https://github.com/brenno0/FlashCards-back-end/commit/da75e5c1980c31c52a079e222cb521f815f28fae))
+
 ## [3.4.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.3.0...v3.4.0) (2026-10-06)
 
 
