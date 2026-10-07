@@ -13,6 +13,8 @@ export interface FlashCardsRepository {
     existingFlashcardIds: string[];
   }): Promise<Flashcard[]>;
   create(data: Prisma.FlashcardUncheckedCreateInput): Promise<Flashcard>;
+  /** Returns how many cards were inserted. */
+  createMany(data: Prisma.FlashcardCreateManyInput[]): Promise<number>;
   getByDeckId({ deckId }: { deckId: string }): Promise<Flashcard[] | null>;
   getById({ flashcardId }: { flashcardId: string }): Promise<Flashcard | null>;
 

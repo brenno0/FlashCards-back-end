@@ -70,6 +70,11 @@ export class PrismaFlashCardsRepository implements FlashCardsRepository {
     return flashcard;
   }
 
+  async createMany(data: Prisma.FlashcardCreateManyInput[]): Promise<number> {
+    const { count } = await prisma.flashcard.createMany({ data });
+    return count;
+  }
+
   async edit({
     flashcardId,
     back,

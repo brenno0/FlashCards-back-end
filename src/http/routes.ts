@@ -3,6 +3,11 @@ import { z } from 'zod';
 import type { FastifyTypedInstance } from '@/@types/fastifyTypes';
 import { boardDocumentSchema } from '@/use-cases/boards/board-document';
 
+import {
+  createApiToken,
+  deleteApiToken,
+  getApiTokens,
+} from './controllers/api-tokens.controller';
 import { authenticate, createUser } from './controllers/auth.controller';
 import {
   getBoardAsset,
@@ -25,6 +30,7 @@ import {
 } from './controllers/decks.controller';
 import {
   createFlashCard,
+  createFlashCardsBulk,
   deleteFlashCard,
   editFlashCard,
   getFlashCard,
@@ -42,7 +48,7 @@ import {
   startStudySession,
 } from './controllers/study-session';
 import { getUser } from './controllers/users.controller';
-import { verifyJWT } from './middlewares/verifyJWT';
+import { verifyJWT, verifySessionJWT } from './middlewares/verifyJWT';
 
 export const appRoutes = async (app: FastifyTypedInstance) => {
   app.post(
@@ -323,6 +329,36 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     createFlashCard,
+  );
+
+  app.post(
+    '/decks/:deckId/flashcards/bulk',
+    {
+      onRequest: [verifyJWT],
+      schema: {
+        tags: ['Flashcards'],
+        operationId: 'createFlashcardsBulk',
+        params: z.object({
+          deckId: z.string().uuid(),
+        }),
+        body: z.object({
+          cards: z
+            .array(
+              z.object({ front: z.string().min(1), back: z.string().min(1) }),
+            )
+            .min(1)
+            .max(200),
+        }),
+        response: {
+          201: z.object({ count: z.number() }),
+          404: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    createFlashCardsBulk,
   );
 
   app.get(
@@ -811,5 +847,67 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
       },
     },
     getLinkPreview,
+  );
+
+  // Personal access tokens (integrations). Session JWT only.
+  const apiTokenSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    prefix: z.string(),
+    lastUsedAt: z.date().nullable(),
+    createdAt: z.date(),
+  });
+
+  app.get(
+    '/api-tokens',
+    {
+      onRequest: [verifySessionJWT],
+      schema: {
+        tags: ['ApiTokens'],
+        operationId: 'getApiTokens',
+        response: {
+          200: z.array(apiTokenSchema),
+        },
+      },
+    },
+    getApiTokens,
+  );
+
+  app.post(
+    '/api-tokens',
+    {
+      onRequest: [verifySessionJWT],
+      schema: {
+        tags: ['ApiTokens'],
+        operationId: 'createApiToken',
+        body: z.object({
+          name: z.string().trim().min(1).max(80),
+        }),
+        response: {
+          201: apiTokenSchema.extend({ token: z.string() }),
+        },
+      },
+    },
+    createApiToken,
+  );
+
+  app.delete(
+    '/api-tokens/:id',
+    {
+      onRequest: [verifySessionJWT],
+      schema: {
+        tags: ['ApiTokens'],
+        operationId: 'deleteApiToken',
+        params: z.object({ id: z.string().uuid() }),
+        response: {
+          204: z.null(),
+          404: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    deleteApiToken,
   );
 };

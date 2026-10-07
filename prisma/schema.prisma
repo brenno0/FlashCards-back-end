@@ -23,6 +23,7 @@ model User {
   boards        Board[]
   boardAssets   BoardAsset[]
   folders       Folder[]
+  apiTokens     ApiToken[]
 }
 
 model Deck {
@@ -197,4 +198,19 @@ enum ProgressStatus {
   LEARNED
   REVIEW
   AGAIN
+}
+
+/// Personal access token for integrations (e.g. Runway). Only the SHA-256 hash is stored.
+model ApiToken {
+  id         String    @id @default(uuid())
+  name       String
+  tokenHash  String    @unique
+  prefix     String
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }

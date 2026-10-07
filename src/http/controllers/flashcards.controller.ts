@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { makeCreateFlashCards } from '@/use-cases/factories/make-create-flashcards';
+import { makeCreateFlashCardsBulk } from '@/use-cases/factories/make-create-flashcards-bulk';
 import { makeDeleteFlashcard } from '@/use-cases/factories/make-delete-flashcard';
 import { makeEditFlashCard } from '@/use-cases/factories/make-edit-flashcard';
 import { makeGetFlashCard } from '@/use-cases/factories/make-get-flashcard';
@@ -42,6 +43,44 @@ export const createFlashCard = async (
         error: 'ResourceNotFoundError',
       });
     }
+  }
+};
+
+export const createFlashCardsBulk = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { deckId } = z
+      .object({ deckId: z.string().uuid() })
+      .parse(request.params);
+    const { cards } = z
+      .object({
+        cards: z
+          .array(
+            z.object({ front: z.string().min(1), back: z.string().min(1) }),
+          )
+          .min(1)
+          .max(200),
+      })
+      .parse(request.body);
+    const { sub } = request.user;
+
+    const { createFlashCardsBulkUseCase } = makeCreateFlashCardsBulk();
+    const { count } = await createFlashCardsBulkUseCase.execute({
+      cards,
+      deckId,
+      userId: sub,
+    });
+    return reply.status(201).send({ count });
+  } catch (error) {
+    if (error instanceof ResourceNotFoundError) {
+      return reply.status(404).send({
+        message: error.message,
+        error: 'ResourceNotFoundError',
+      });
+    }
+    throw error;
   }
 };
 
