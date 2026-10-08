@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.5.0...v3.6.0) (2026-10-08)
+
+
+### Features
+
+* schedule reviews with FSRS ([7996991](https://github.com/brenno0/FlashCards-back-end/commit/799699159d7b5cb1a1b77f90a17d375af1d9f116))
+
 ## [3.5.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.4.0...v3.5.0) (2026-10-07)
 
 
