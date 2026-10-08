@@ -13,10 +13,12 @@ export class FlashcardsProgressPrismaRepository
     userId,
     deckId,
     nextReviewAt,
+    take,
   }: {
     userId: string;
     deckId: string;
     nextReviewAt: Date;
+    take: number;
   }): Promise<FlashcardProgressWithFlashcard[]> {
     const progress = await prisma.flashcardProgress.findMany({
       where: {
@@ -34,7 +36,7 @@ export class FlashcardsProgressPrismaRepository
       orderBy: {
         nextReviewAt: 'asc',
       },
-      take: 10,
+      take,
     });
 
     return progress;
@@ -61,18 +63,7 @@ export class FlashcardsProgressPrismaRepository
   async create(
     data: Prisma.FlashcardProgressUncheckedCreateInput,
   ): Promise<FlashcardProgress> {
-    const createdProgress = await prisma.flashcardProgress.create({
-      data: {
-        userId: data.userId,
-        flashcardId: data.flashcardId,
-        status: 'NEW',
-        nextReviewAt: data.nextReviewAt,
-        interval: 0,
-        repetitions: 0,
-        easeFactor: 2.5,
-        lastStudiedAt: null,
-      },
-    });
+    const createdProgress = await prisma.flashcardProgress.create({ data });
 
     return createdProgress;
   }
@@ -82,14 +73,7 @@ export class FlashcardsProgressPrismaRepository
   ): Promise<FlashcardProgress> {
     const updatedProgress = await prisma.flashcardProgress.update({
       where: { id },
-      data: {
-        status: data.status,
-        lastStudiedAt: data.lastStudiedAt,
-        nextReviewAt: data.nextReviewAt,
-        repetitions: data.repetitions,
-        interval: data.interval,
-        easeFactor: data.easeFactor,
-      },
+      data,
     });
 
     return updatedProgress;

@@ -8,12 +8,12 @@ export class PrismaFlashCardsRepository implements FlashCardsRepository {
   async findManyWithNoProgress({
     deckId,
     userId,
-    quantityOfCardsToTake,
+    take,
     existingFlashcardIds,
   }: {
     deckId: string;
     userId: string;
-    quantityOfCardsToTake: number;
+    take: number;
     existingFlashcardIds: string[];
   }): Promise<Flashcard[]> {
     const flashcards = await prisma.flashcard.findMany({
@@ -31,7 +31,9 @@ export class PrismaFlashCardsRepository implements FlashCardsRepository {
           },
         },
       },
-      take: 20 - quantityOfCardsToTake,
+      // Oldest first: new cards are introduced in the order they were added.
+      orderBy: { createdAt: 'asc' },
+      take,
     });
 
     return flashcards;

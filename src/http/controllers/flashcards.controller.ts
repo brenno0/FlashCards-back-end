@@ -183,7 +183,8 @@ export const updateFlashcardsProgress = async (
       id: z.string().uuid(),
     });
     const answerFlashcardBodySchema = z.object({
-      quality: z.number().min(0).max(5),
+      // 1 Again, 2 Hard, 3 Good, 4 Easy (5 = Easy, legacy five-point clients).
+      quality: z.number().int().min(1).max(5),
     });
 
     const { id: flashcardId } = updateFlashcardsProgressParamsSchema.parse(

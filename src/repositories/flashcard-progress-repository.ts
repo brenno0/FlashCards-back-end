@@ -14,14 +14,17 @@ export interface FlashcardsProgressRepository {
     flashcardId: string;
   }): Promise<FlashcardProgress | null>;
 
+  /** Progress due at or before `nextReviewAt`, most overdue first. */
   findMany({
     userId,
     deckId,
     nextReviewAt,
+    take,
   }: {
     userId: string;
     deckId: string;
     nextReviewAt: Date;
+    take: number;
   }): Promise<FlashcardProgressWithFlashcard[]>;
   create(
     data: Prisma.FlashcardProgressUncheckedCreateInput,

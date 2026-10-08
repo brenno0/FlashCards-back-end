@@ -4,12 +4,12 @@ export interface FlashCardsRepository {
   findManyWithNoProgress({
     deckId,
     userId,
-    quantityOfCardsToTake,
+    take,
     existingFlashcardIds,
   }: {
     deckId: string;
     userId: string;
-    quantityOfCardsToTake: number;
+    take: number;
     existingFlashcardIds: string[];
   }): Promise<Flashcard[]>;
   create(data: Prisma.FlashcardUncheckedCreateInput): Promise<Flashcard>;

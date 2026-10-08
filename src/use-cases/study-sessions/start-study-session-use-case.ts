@@ -9,34 +9,12 @@ interface StartStudySessionRequest {
   userId: string;
   deckId: string;
 }
-interface GetFlashcardsForTodaysReviewProps extends StartStudySessionRequest {
-  nextReviewAt: Date;
-}
-interface SessionFlashcards {
-  deckId: string;
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  front: string;
-  back: string;
-}
-interface PushNewCardsIfSessionHasntEnoughProps
-  extends StartStudySessionRequest {
-  sessionFlashcards: SessionFlashcards[];
-  existingFlashcardIds: string[];
-}
-interface NewCards {
-  deckId: string;
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  front: string;
-  back: string;
-}
-interface CreateProgressToNewCardsProps
-  extends Omit<StartStudySessionRequest, 'deckId'> {
-  newCards: NewCards[];
-}
+
+/** Due cards per session, most overdue first. */
+export const MAX_REVIEWS_PER_SESSION = 50;
+/** New cards only top a session up to this size, so a review backlog is cleared before adding more. */
+export const SESSION_TARGET_SIZE = 20;
+export const MAX_NEW_PER_SESSION = 10;
 
 export class StartStudySessionUseCase {
   constructor(
@@ -44,103 +22,52 @@ export class StartStudySessionUseCase {
     private readonly decksRepository: DecksRepository,
     private readonly flashcardsProgressRepository: FlashcardsProgressRepository,
     private readonly flashcardsRepository: FlashCardsRepository,
+    private readonly now: () => Date = () => new Date(),
   ) {}
 
   public async handle({ deckId, userId }: StartStudySessionRequest) {
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
+    const now = this.now();
     const deck = await this.decksRepository.getById({ deckId, userId });
 
     if (!deck) {
       throw new ResourceNotFoundError({ resource: 'Deck' });
     }
 
-    const { existingFlashcardIds, sessionFlashcards } =
-      await this.getFlashcardsForTodaysReview({
-        userId,
-        deckId,
-        nextReviewAt: today,
-      });
+    const due = await this.flashcardsProgressRepository.findMany({
+      deckId,
+      userId,
+      nextReviewAt: now,
+      take: MAX_REVIEWS_PER_SESSION,
+    });
+    const reviewCards = due.map((progress) => progress.flashcard);
 
-    if (sessionFlashcards.length < 20) {
-      await this.pushNewCardsIfSessionHasntEnough({
-        deckId,
-        existingFlashcardIds,
-        sessionFlashcards,
-        userId,
-      });
-    }
+    const newLimit = Math.min(
+      MAX_NEW_PER_SESSION,
+      Math.max(0, SESSION_TARGET_SIZE - reviewCards.length),
+    );
+    // New cards get progress on their first answer, so leaving a session early keeps them new.
+    const newCards = newLimit
+      ? await this.flashcardsRepository.findManyWithNoProgress({
+          deckId,
+          userId,
+          take: newLimit,
+          existingFlashcardIds: reviewCards.map((card) => card.id),
+        })
+      : [];
 
     const studySession = await this.studySessionsRepository.create({
       deckId,
       userId,
-      startedAt: new Date(),
+      startedAt: now,
     });
 
     return {
       ...studySession,
-      flashcards: sessionFlashcards.map((card) => ({
+      flashcards: [...reviewCards, ...newCards].map((card) => ({
         id: card.id,
         front: card.front,
         back: card.back,
       })),
     };
-  }
-
-  private async getFlashcardsForTodaysReview({
-    userId,
-    deckId,
-    nextReviewAt,
-  }: GetFlashcardsForTodaysReviewProps) {
-    const cardsToReviewProgress =
-      await this.flashcardsProgressRepository.findMany({
-        deckId,
-        nextReviewAt,
-        userId,
-      });
-
-    const sessionFlashcards = cardsToReviewProgress.map((p) => p.flashcard);
-    const existingFlashcardIds = sessionFlashcards.map((card) => card.id);
-
-    return { sessionFlashcards, existingFlashcardIds };
-  }
-
-  private async pushNewCardsIfSessionHasntEnough({
-    sessionFlashcards,
-    existingFlashcardIds,
-    deckId,
-    userId,
-  }: PushNewCardsIfSessionHasntEnoughProps) {
-    if (sessionFlashcards.length < 20) {
-      const newCards = await this.flashcardsRepository.findManyWithNoProgress({
-        deckId,
-        existingFlashcardIds,
-        quantityOfCardsToTake: sessionFlashcards.length,
-        userId,
-      });
-      sessionFlashcards.push(...newCards);
-      this.createProgressToNewCards({ newCards, userId });
-    }
-  }
-
-  private async createProgressToNewCards({
-    newCards,
-    userId,
-  }: CreateProgressToNewCardsProps) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    for (const newCard of newCards) {
-      await this.flashcardsProgressRepository.create({
-        userId,
-        flashcardId: newCard.id,
-        status: 'NEW',
-        nextReviewAt: today,
-        interval: 0,
-        repetitions: 0,
-        easeFactor: 2.5,
-        lastStudiedAt: null,
-      });
-    }
   }
 }

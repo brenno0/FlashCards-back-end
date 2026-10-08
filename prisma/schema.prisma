@@ -80,8 +80,15 @@ model FlashcardProgress {
   nextReviewAt  DateTime       @default(now()) // Corresponde ao 'nextReview'
   interval      Int            @default(0)
   repetitions   Int            @default(0)
-  easeFactor    Float          @default(2.5)
+  easeFactor    Float          @default(2.5) // Legacy SM-2; unused since FSRS
   lastStudiedAt DateTime? // Corresponde ao 'lastReviewed'
+
+  // FSRS memory state (ts-fsrs). `interval` holds scheduled_days and `repetitions` reps.
+  state         Int            @default(0) // 0 New, 1 Learning, 2 Review, 3 Relearning
+  stability     Float          @default(0)
+  difficulty    Float          @default(0)
+  lapses        Int            @default(0)
+  learningSteps Int            @default(0)
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String

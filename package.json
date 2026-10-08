@@ -74,6 +74,7 @@
         "fastify-type-provider-zod": "4.0.0",
         "pdf-parse": "1.1.1",
         "prisma": "6.10.1",
+        "ts-fsrs": "5.4.1",
         "util": "0.12.5",
         "zod": "3.25.67"
     },
