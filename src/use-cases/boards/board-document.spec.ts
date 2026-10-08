@@ -32,6 +32,12 @@ const icon = (id: string, parentId?: string) => ({
 });
 
 describe('boardDocumentSchema', () => {
+  it('preserves arrow appearance alongside rich labels through validation', () => {
+    const data = { path: 'elbow', head: 'diamond', style: 'dotted', arrowStart: true, arrowEnd: false, labelDoc: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Connect' }] }] } } as const;
+    const parsed = boardDocumentSchema.parse(doc({ edges: [{ id: 'e', source: 'a', target: 'b', data }] }));
+    expect(parsed.edges[0].data).toEqual(data);
+    expect(boardDocumentSchema.safeParse(doc({ edges: [{ id: 'e', source: 'a', target: 'b', data: { path: 'unknown' } as never }] })).success).toBe(false);
+  });
   it('accepts every node type', () => {
     const result = boardDocumentSchema.safeParse(
       doc({

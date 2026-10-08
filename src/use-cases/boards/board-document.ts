@@ -151,7 +151,9 @@ export const boardEdgeSchema = z.object({
     .object({
       arrowStart: z.boolean().optional(),
       arrowEnd: z.boolean().optional(),
-      style: z.enum(['solid', 'dashed']).optional(),
+      style: z.enum(['solid', 'dashed', 'dotted']).optional(),
+      path: z.enum(['curved', 'straight', 'elbow', 'step']).optional(),
+      head: z.enum(['triangle', 'open', 'diamond', 'circle']).optional(),
       labelDoc: richDoc.optional(),
     })
     .optional(),
