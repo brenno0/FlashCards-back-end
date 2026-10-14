@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.6.0...v3.7.0) (2026-10-14)
+
+
+### Features
+
+* **boards:** add board-level default arrow style ([c30c6be](https://github.com/brenno0/FlashCards-back-end/commit/c30c6be0dbbbf29d019d5df66fda5c22844043ff))
+* **boards:** persist configurable arrow appearance ([eb63ab2](https://github.com/brenno0/FlashCards-back-end/commit/eb63ab236e78552bfdbf128f083d666d5db09483))
+
 ## [3.6.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.5.0...v3.6.0) (2026-10-08)
 
 
