@@ -18,8 +18,11 @@ import { CreateBoardUseCase } from './create-board-use-case';
 import { DeleteBoardUseCase } from './delete-board-use-case';
 import { GetBoardByIdUseCase } from './get-board-by-id-use-case';
 import { GetBoardsUseCase } from './get-boards-use-case';
+import { GetPublicBoardAssetUseCase } from './get-public-board-asset-use-case';
+import { GetPublicBoardUseCase } from './get-public-board-use-case';
 import { SaveBoardContentUseCase } from './save-board-content-use-case';
 import { UpdateBoardMetaUseCase } from './update-board-meta-use-case';
+import { UploadBoardAssetUseCase } from './upload-board-asset-use-case';
 
 const USER = 'user-1';
 const OTHER_USER = 'user-2';
@@ -280,5 +283,87 @@ describe('DeleteBoardUseCase', () => {
       }),
     ).rejects.toBeInstanceOf(ResourceNotFoundError);
     expect(boards.items).toHaveLength(1);
+  });
+});
+
+describe('GetPublicBoardUseCase', () => {
+  it('returns a public board with no userId required', async () => {
+    const { board } = await createBoard();
+    await new UpdateBoardMetaUseCase(boards, decks, folders).handle({
+      boardId: board.id,
+      userId: USER,
+      isPublic: true,
+    });
+
+    const { board: found } = await new GetPublicBoardUseCase(boards).handle({
+      boardId: board.id,
+    });
+    expect(found.id).toBe(board.id);
+  });
+
+  it('404s for a board that is not public', async () => {
+    const { board } = await createBoard();
+    await expect(
+      new GetPublicBoardUseCase(boards).handle({ boardId: board.id }),
+    ).rejects.toBeInstanceOf(ResourceNotFoundError);
+  });
+
+  it('404s for an unknown board id', async () => {
+    await expect(
+      new GetPublicBoardUseCase(boards).handle({ boardId: randomUUID() }),
+    ).rejects.toBeInstanceOf(ResourceNotFoundError);
+  });
+});
+
+describe('GetPublicBoardAssetUseCase', () => {
+  const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1]);
+
+  it('serves an asset on a public board with no userId required', async () => {
+    const { board } = await createBoard();
+    const { asset } = await new UploadBoardAssetUseCase(
+      boards,
+      assets,
+      storage,
+    ).handle({
+      boardId: board.id,
+      userId: USER,
+      kind: 'image',
+      fileName: 'a.png',
+      body: PNG,
+    });
+    await new UpdateBoardMetaUseCase(boards, decks, folders).handle({
+      boardId: board.id,
+      userId: USER,
+      isPublic: true,
+    });
+
+    const result = await new GetPublicBoardAssetUseCase(
+      boards,
+      assets,
+      storage,
+    ).handle({ boardId: board.id, assetId: asset.id });
+    expect(result.asset.id).toBe(asset.id);
+  });
+
+  it('404s for an asset on a board that is not public', async () => {
+    const { board } = await createBoard();
+    const { asset } = await new UploadBoardAssetUseCase(
+      boards,
+      assets,
+      storage,
+    ).handle({
+      boardId: board.id,
+      userId: USER,
+      kind: 'image',
+      fileName: 'a.png',
+      body: PNG,
+    });
+
+    await expect(
+      new GetPublicBoardAssetUseCase(boards, assets, storage).handle({
+        boardId: board.id,
+        assetId: asset.id,
+      }),
+    ).rejects.toBeInstanceOf(ResourceNotFoundError);
   });
 });

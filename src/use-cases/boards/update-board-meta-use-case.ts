@@ -11,6 +11,7 @@ interface UpdateBoardMetaUseCaseRequest {
   title?: string;
   deckId?: string | null;
   folderId?: string | null;
+  isPublic?: boolean;
 }
 
 export class UpdateBoardMetaUseCase {
@@ -26,6 +27,7 @@ export class UpdateBoardMetaUseCase {
     title,
     deckId,
     folderId,
+    isPublic,
   }: UpdateBoardMetaUseCaseRequest) {
     const board = await this.boardsRepository.findById({ boardId, userId });
     if (!board) {
@@ -47,7 +49,7 @@ export class UpdateBoardMetaUseCase {
 
     const updatedBoard = await this.boardsRepository.updateMeta({
       boardId,
-      data: { title, deckId, folderId },
+      data: { title, deckId, folderId, isPublic },
     });
 
     return { board: updatedBoard };

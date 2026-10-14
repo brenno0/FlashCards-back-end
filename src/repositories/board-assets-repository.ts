@@ -23,6 +23,14 @@ export interface BoardAssetsRepository {
     boardId: string;
     userId: string;
   }): Promise<BoardAsset | null>;
+  /** Looks up an asset by id + board alone, with no owner check (caller must verify the board is public). */
+  findPublicById({
+    assetId,
+    boardId,
+  }: {
+    assetId: string;
+    boardId: string;
+  }): Promise<BoardAsset | null>;
   listByBoard({ boardId }: { boardId: string }): Promise<BoardAsset[]>;
   /** Clears orphanedAt on referenced assets; stamps `now` on unreferenced ones not yet orphaned. */
   syncOrphans({

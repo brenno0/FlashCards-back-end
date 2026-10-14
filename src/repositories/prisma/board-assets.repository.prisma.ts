@@ -25,6 +25,16 @@ export class BoardAssetsPrismaRepository implements BoardAssetsRepository {
     });
   }
 
+  async findPublicById({
+    assetId,
+    boardId,
+  }: {
+    assetId: string;
+    boardId: string;
+  }): Promise<BoardAsset | null> {
+    return prisma.boardAsset.findFirst({ where: { id: assetId, boardId } });
+  }
+
   async listByBoard({ boardId }: { boardId: string }): Promise<BoardAsset[]> {
     return prisma.boardAsset.findMany({ where: { boardId } });
   }

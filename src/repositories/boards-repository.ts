@@ -2,7 +2,14 @@ import type { Board, Prisma } from 'generated/prisma';
 
 export type BoardSummary = Pick<
   Board,
-  'id' | 'title' | 'deckId' | 'folderId' | 'version' | 'createdAt' | 'updatedAt'
+  | 'id'
+  | 'title'
+  | 'deckId'
+  | 'folderId'
+  | 'version'
+  | 'isPublic'
+  | 'createdAt'
+  | 'updatedAt'
 >;
 
 export interface BoardsRepository {
@@ -21,6 +28,8 @@ export interface BoardsRepository {
     boardId: string;
     userId: string;
   }): Promise<Board | null>;
+  /** Looks up a board by id alone; callers must still check `isPublic` themselves. */
+  findPublicById({ boardId }: { boardId: string }): Promise<Board | null>;
   updateMeta({
     boardId,
     data,
@@ -30,6 +39,7 @@ export interface BoardsRepository {
       title?: string;
       deckId?: string | null;
       folderId?: string | null;
+      isPublic?: boolean;
     };
   }): Promise<Board>;
   /** Writes content only when stored version equals expectedVersion. Returns new version, or null when no row matched. */

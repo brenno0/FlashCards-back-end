@@ -9,6 +9,7 @@ import {
 import { ResourceNotFoundError } from '@/use-cases/errors/resourceNotFound';
 import { UnsupportedAssetTypeError } from '@/use-cases/errors/unsupportedAssetType';
 import { makeGetBoardAsset } from '@/use-cases/factories/make-get-board-asset';
+import { makeGetPublicBoardAsset } from '@/use-cases/factories/make-get-public-board-asset';
 import { makeUploadBoardAsset } from '@/use-cases/factories/make-upload-board-asset';
 
 const handleAssetError = (error: unknown, reply: FastifyReply) => {
@@ -111,6 +112,38 @@ export const getBoardAsset = async (
       .header('Content-Length', asset.size)
       .header('X-Content-Type-Options', 'nosniff')
       .header('Cache-Control', 'private, max-age=31536000, immutable')
+      .header(
+        'Content-Disposition',
+        contentDisposition(isImage ? 'inline' : 'attachment', asset.fileName),
+      )
+      .header('Content-Security-Policy', "default-src 'none'; sandbox")
+      .send(stream);
+  } catch (error) {
+    return handleAssetError(error, reply);
+  }
+};
+
+export const getPublicBoardAsset = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { id, assetId } = z
+      .object({ id: z.string().uuid(), assetId: z.string().uuid() })
+      .parse(request.params);
+
+    const { getPublicBoardAssetUseCase } = makeGetPublicBoardAsset();
+    const { asset, stream } = await getPublicBoardAssetUseCase.handle({
+      boardId: id,
+      assetId,
+    });
+
+    const isImage = asset.kind === 'IMAGE';
+    return reply
+      .header('Content-Type', asset.mimeType)
+      .header('Content-Length', asset.size)
+      .header('X-Content-Type-Options', 'nosniff')
+      .header('Cache-Control', 'public, max-age=31536000, immutable')
       .header(
         'Content-Disposition',
         contentDisposition(isImage ? 'inline' : 'attachment', asset.fileName),

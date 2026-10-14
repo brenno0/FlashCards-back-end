@@ -11,6 +11,7 @@ import {
 import { authenticate, createUser } from './controllers/auth.controller';
 import {
   getBoardAsset,
+  getPublicBoardAsset,
   uploadBoardAsset,
 } from './controllers/board-assets.controller';
 import {
@@ -18,6 +19,7 @@ import {
   deleteBoard,
   getBoardById,
   getBoards,
+  getPublicBoardById,
   saveBoardContent,
   updateBoardMeta,
 } from './controllers/boards.controller';
@@ -550,6 +552,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     deckId: z.string().nullable(),
     folderId: z.string().nullable(),
     version: z.number(),
+    isPublic: z.boolean(),
     createdAt: z.date(),
     updatedAt: z.date(),
   });
@@ -611,6 +614,44 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
     getBoardById,
   );
 
+  const publicBoardSchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    content: boardDocumentSchema,
+    updatedAt: z.date(),
+  });
+
+  app.get(
+    '/public/boards/:id',
+    {
+      schema: {
+        tags: ['Boards'],
+        operationId: 'getPublicBoardById',
+        params: boardParamsSchema,
+        response: {
+          200: publicBoardSchema,
+          404: boardErrorSchema,
+        },
+      },
+    },
+    getPublicBoardById,
+  );
+
+  app.get(
+    '/public/boards/:id/assets/:assetId',
+    {
+      schema: {
+        tags: ['Boards'],
+        operationId: 'getPublicBoardAsset',
+        params: z.object({ id: z.string().uuid(), assetId: z.string().uuid() }),
+        response: {
+          404: boardErrorSchema,
+        },
+      },
+    },
+    getPublicBoardAsset,
+  );
+
   app.patch(
     '/boards/:id',
     {
@@ -623,6 +664,7 @@ export const appRoutes = async (app: FastifyTypedInstance) => {
           title: z.string().min(1).max(200).optional(),
           deckId: z.string().uuid().nullish(),
           folderId: z.string().uuid().nullish(),
+          isPublic: z.boolean().optional(),
         }),
         response: {
           200: boardSchema,

@@ -33,6 +33,20 @@ export class InMemoryBoardAssetsRepository implements BoardAssetsRepository {
     );
   }
 
+  async findPublicById({
+    assetId,
+    boardId,
+  }: {
+    assetId: string;
+    boardId: string;
+  }): Promise<BoardAsset | null> {
+    return (
+      this.items.find(
+        (item) => item.id === assetId && item.boardId === boardId,
+      ) ?? null
+    );
+  }
+
   async listByBoard({ boardId }: { boardId: string }): Promise<BoardAsset[]> {
     return this.items.filter((item) => item.boardId === boardId);
   }

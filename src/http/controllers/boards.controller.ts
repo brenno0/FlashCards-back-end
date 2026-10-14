@@ -10,6 +10,7 @@ import { makeCreateBoard } from '@/use-cases/factories/make-create-board';
 import { makeDeleteBoard } from '@/use-cases/factories/make-delete-board';
 import { makeGetBoardById } from '@/use-cases/factories/make-get-board-by-id';
 import { makeGetBoards } from '@/use-cases/factories/make-get-boards';
+import { makeGetPublicBoard } from '@/use-cases/factories/make-get-public-board';
 import { makeSaveBoardContent } from '@/use-cases/factories/make-save-board-content';
 import { makeUpdateBoardMeta } from '@/use-cases/factories/make-update-board-meta';
 
@@ -107,17 +108,39 @@ export const getBoardById = async (
   }
 };
 
+export const getPublicBoardById = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const { id } = boardParamsSchema.parse(request.params);
+
+    const { getPublicBoardUseCase } = makeGetPublicBoard();
+    const { board } = await getPublicBoardUseCase.handle({ boardId: id });
+
+    return reply.status(200).send({
+      id: board.id,
+      title: board.title,
+      content: board.content,
+      updatedAt: board.updatedAt,
+    });
+  } catch (error) {
+    return handleBoardError(error, reply);
+  }
+};
+
 export const updateBoardMeta = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
   try {
     const { id } = boardParamsSchema.parse(request.params);
-    const { title, deckId, folderId } = z
+    const { title, deckId, folderId, isPublic } = z
       .object({
         title: z.string().min(1).max(200).optional(),
         deckId: z.string().uuid().nullish(),
         folderId: z.string().uuid().nullish(),
+        isPublic: z.boolean().optional(),
       })
       .parse(request.body);
     const { sub: userId } = request.user;
@@ -129,6 +152,7 @@ export const updateBoardMeta = async (
       title,
       deckId,
       folderId,
+      isPublic,
     });
 
     return reply.status(200).send(board);

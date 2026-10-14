@@ -23,6 +23,7 @@ export class BoardsPrismaRepository implements BoardsRepository {
         deckId: true,
         folderId: true,
         version: true,
+        isPublic: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -40,6 +41,14 @@ export class BoardsPrismaRepository implements BoardsRepository {
     return prisma.board.findFirst({ where: { id: boardId, userId } });
   }
 
+  async findPublicById({
+    boardId,
+  }: {
+    boardId: string;
+  }): Promise<Board | null> {
+    return prisma.board.findUnique({ where: { id: boardId } });
+  }
+
   async updateMeta({
     boardId,
     data,
@@ -49,6 +58,7 @@ export class BoardsPrismaRepository implements BoardsRepository {
       title?: string;
       deckId?: string | null;
       folderId?: string | null;
+      isPublic?: boolean;
     };
   }): Promise<Board> {
     return prisma.board.update({ where: { id: boardId }, data });

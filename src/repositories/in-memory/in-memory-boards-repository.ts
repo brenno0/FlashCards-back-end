@@ -25,6 +25,7 @@ export class InMemoryBoardsRepository implements BoardsRepository {
       folderId: data.folderId ?? null,
       content: data.content as Prisma.JsonValue,
       version: 1,
+      isPublic: false,
       createdAt: now,
       updatedAt: now,
     };
@@ -37,12 +38,22 @@ export class InMemoryBoardsRepository implements BoardsRepository {
       .filter((item) => item.userId === userId)
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
       .map(
-        ({ id, title, deckId, folderId, version, createdAt, updatedAt }) => ({
+        ({
           id,
           title,
           deckId,
           folderId,
           version,
+          isPublic,
+          createdAt,
+          updatedAt,
+        }) => ({
+          id,
+          title,
+          deckId,
+          folderId,
+          version,
+          isPublic,
           createdAt,
           updatedAt,
         }),
@@ -63,6 +74,14 @@ export class InMemoryBoardsRepository implements BoardsRepository {
     );
   }
 
+  async findPublicById({
+    boardId,
+  }: {
+    boardId: string;
+  }): Promise<Board | null> {
+    return this.items.find((item) => item.id === boardId) ?? null;
+  }
+
   async updateMeta({
     boardId,
     data,
@@ -72,6 +91,7 @@ export class InMemoryBoardsRepository implements BoardsRepository {
       title?: string;
       deckId?: string | null;
       folderId?: string | null;
+      isPublic?: boolean;
     };
   }): Promise<Board> {
     const board = this.items.find((item) => item.id === boardId);
@@ -86,6 +106,9 @@ export class InMemoryBoardsRepository implements BoardsRepository {
     }
     if (data.folderId !== undefined) {
       board.folderId = data.folderId;
+    }
+    if (data.isPublic !== undefined) {
+      board.isPublic = data.isPublic;
     }
     board.updatedAt = new Date();
     return board;
