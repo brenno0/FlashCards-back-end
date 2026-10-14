@@ -140,6 +140,15 @@ export const boardNodeSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
+/** Arrowhead/line appearance, shared by individual edges and the board-level default. */
+const edgeStyle = z.object({
+  arrowStart: z.boolean().optional(),
+  arrowEnd: z.boolean().optional(),
+  style: z.enum(['solid', 'dashed', 'dotted']).optional(),
+  path: z.enum(['curved', 'straight', 'elbow', 'step']).optional(),
+  head: z.enum(['triangle', 'open', 'diamond', 'circle']).optional(),
+});
+
 export const boardEdgeSchema = z.object({
   id,
   source: id,
@@ -147,16 +156,7 @@ export const boardEdgeSchema = z.object({
   sourceHandle: z.string().max(64).nullish(),
   targetHandle: z.string().max(64).nullish(),
   label: z.string().max(2000).optional(),
-  data: z
-    .object({
-      arrowStart: z.boolean().optional(),
-      arrowEnd: z.boolean().optional(),
-      style: z.enum(['solid', 'dashed', 'dotted']).optional(),
-      path: z.enum(['curved', 'straight', 'elbow', 'step']).optional(),
-      head: z.enum(['triangle', 'open', 'diamond', 'circle']).optional(),
-      labelDoc: richDoc.optional(),
-    })
-    .optional(),
+  data: edgeStyle.extend({ labelDoc: richDoc.optional() }).optional(),
 });
 
 export const boardDocumentSchema = z.object({
@@ -164,6 +164,8 @@ export const boardDocumentSchema = z.object({
   viewport: z.object({ x: z.number(), y: z.number(), zoom: z.number() }),
   nodes: z.array(boardNodeSchema),
   edges: z.array(boardEdgeSchema),
+  /** Arrow appearance applied to new arrows drawn on this board (until changed per-arrow). */
+  defaultEdgeStyle: edgeStyle.optional(),
 });
 
 export type BoardNode = z.infer<typeof boardNodeSchema>;

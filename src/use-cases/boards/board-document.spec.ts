@@ -321,6 +321,35 @@ describe('link node URLs', () => {
   });
 });
 
+describe('defaultEdgeStyle', () => {
+  it('accepts a board-level default arrow appearance', () => {
+    const result = boardDocumentSchema.safeParse(
+      doc({
+        defaultEdgeStyle: {
+          arrowStart: false,
+          arrowEnd: true,
+          style: 'dashed',
+          path: 'step',
+          head: 'diamond',
+        },
+      }),
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it('is optional and omitted by default', () => {
+    expect(boardDocumentSchema.safeParse(doc({})).success).toBe(true);
+    expect(EMPTY_BOARD_DOCUMENT.defaultEdgeStyle).toBeUndefined();
+  });
+
+  it('rejects an unknown line style on the default', () => {
+    const result = boardDocumentSchema.safeParse(
+      doc({ defaultEdgeStyle: { style: 'wavy' as never } }),
+    );
+    expect(result.success).toBe(false);
+  });
+});
+
 describe('validateBoardGraph', () => {
   it('accepts nested sections ordered parents first, and section-to-section edges', () => {
     const result = validateBoardGraph(
