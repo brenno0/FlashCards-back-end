@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.7.2](https://github.com/brenno0/FlashCards-back-end/compare/v3.7.1...v3.7.2) (2026-10-14)
+
+
+### Bug Fixes
+
+* **flashcards:** send a response on DELETE /flashcards/:id ([bfc30d4](https://github.com/brenno0/FlashCards-back-end/commit/bfc30d4577464c33836eda39124b92c3690586b2))
+
 ### [3.7.1](https://github.com/brenno0/FlashCards-back-end/compare/v3.7.0...v3.7.1) (2026-10-14)
 
 ## [3.7.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.6.0...v3.7.0) (2026-10-14)
