@@ -162,14 +162,18 @@ export const deleteFlashCard = async (
 
     await deleteFlashcardUseCase.handle({ id });
 
-    return reply.status(200);
+    return reply.status(200).send();
   } catch (error: any) {
     if (error instanceof ResourceNotFoundError) {
-      reply.status(404).send({
+      return reply.status(404).send({
         message: error.message,
         error: 'ResourceNotFoundError',
       });
     }
+    return reply.status(500).send({
+      message: 'Unexpected error deleting flashcard.',
+      error: 'InternalServerError',
+    });
   }
 };
 
