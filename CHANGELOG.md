@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.0](https://github.com/brenno0/FlashCards-back-end/compare/v3.7.4...v3.8.0) (2026-10-14)
+
+
+### Features
+
+* **boards:** add public sharing (isPublic + public read routes) ([c2da294](https://github.com/brenno0/FlashCards-back-end/commit/c2da2945e987f822a2f8a58ef2c130e39068a58b))
+
 ### [3.7.4](https://github.com/brenno0/FlashCards-back-end/compare/v3.7.3...v3.7.4) (2026-10-14)
 
 ### [3.7.3](https://github.com/brenno0/FlashCards-back-end/compare/v3.7.2...v3.7.3) (2026-10-14)
